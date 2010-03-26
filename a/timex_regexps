@@ -1,0 +1,18 @@
+(minute|hour|day|week|month|quarter|year) - calendar_interval
+(early|late|earlier|later)? (this|next|last) (year|month|week)
+now
+((mon|tues|wednes|thurs|fri|satur|sun|to|yester)day|(mon|tue|wed|thu|fri|sat|sun)|tomorrow) - dayspec
+(this|next|last|first|second|third|fourth|final) quarter
+dayspec? [0-9]{1-2}[./- ]`monthspec`[./- ](19|20)?[0-9]{2}
+19[0-9]{2}|20[00-10] - fullyear
+'[0-9]{2} - shortyear
+`textual number` `calendar_interval`s?
+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|[01][0-9]|`fullmonth`) - monthspec
+(january|february|march|april|may|june|july|august|september|october|november|december) - fullmonth
+(recent|previous|past|first|last)? ([0-9]+|`textual number`|couple of|few)?[ -]`calendar_interval`s? (ago|later|earlier)?
+((twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)?-?(one|two|three|four|five|six|seven|eight|nine)?|(ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)) - textual number
+the `calendar_interval`s?
+(early|mid|end)[- ](`fullmonth`|`calendar_interval`)
+(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth) - simple_ordinals
+(the )?`simple_ordinals` `calendar_interval`
+(a|`textual number`) `calendar_interval`s? (earlier|later|previous|ago|since)
