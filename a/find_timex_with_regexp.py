@@ -1,5 +1,20 @@
 import re
 
+def findSubstrings(text, substring):
+    # position pos (index) is moved up for each call to this generator
+    pos = -1
+    while True:
+        # move index up on next call
+        pos = text.find(substring, pos + 1)
+        # not found or done
+        if pos < 0:
+            break
+        yield pos
+ 
+
+def addBoundary(string):
+    return '\\b' + string + '\\b'
+
 #(minute|hour|day|week|month|quarter|year) - calendar_interval
 #((mon|tues|wednes|thurs|fri|satur|sun|to|yester)day|(mon|tue|wed|thu|fri|sat|sun)|tomorrow) - dayspec
 #(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|[01][0-9]|`fullmonth`) - monthspec
@@ -42,7 +57,7 @@ timex_re.append("(((early|late|earlier|later) )?((this|next|last) )?("+calendar_
 timex_re.append("(now)")
 timex_re.append("((first|second|third|fourth|final) quarter)")
 timex_re.append("(("+dayspec+" )?[0-9]{1,2}([\.\/\-\ ])([0-9]{1,2}|" + monthspec + ")\\7(19|20)?[0-9]{2})") # backreference id may change, be sure it's correct after altering this regex
-timex_re.append("("+textual_number + "[\-\ ]" + calendar_interval + "([\-\ ]long)?)")
+timex_re.append("("+textual_number + "[\-\ ]" + calendar_interval + "([\-\ ](long|old))?)")
 timex_re.append("(((recent|previous|past|first|last) )?(([0-9]+|"+textual_number+"|couple of|few) )?"+calendar_interval+"s?( (ago|later|earlier))?)")
 timex_re.append("(the "+calendar_interval+"s?)")
 timex_re.append("((early|mid|end)[\-\ ]("+fullmonth+"|"+calendar_interval+"))")
@@ -57,65 +72,127 @@ timex_re.append("("+vague+" "+textual_number+" "+calendar_interval+")")
 timex_re.append("(("+times+"( "+longdays+")?)|("+longdays+" "+times+"))")
 timex_re.append("("+monthspec+"\.? [0-3]?[0-9](st|nd|rd|th)?)")
 
+timex_re = map(addBoundary, timex_re)
 #timex_re = map(re.compile, timex_re)
 
-file = open('train_6')
-input_doc = file.read().replace('\n',  ' ')
+file = open('/home/leon/time/tempeval2-trial/data/english/base-segmentation.tab')
 
-# timex list structure is, list of timex, timex is dict of start, end, text
-doc_timexes= []
+current_tokens = []
+current_file = ''
+token_window_size = 5
+doc_timexes = set()
 
+for line in file:
+    filename,  sentence,  word,  token = line.strip().split('\t')
 
-# feed this regex list a set of ngrams; look for complete matches.
-for test in timex_re:
-    matches = re.compile(test,  re.I).finditer(input_doc)
+    if filename != current_file:
+        print "New file:",  filename
+        current_file = filename
+    
+    word = int(word)
+    
+    if word == 0:
+        print "New sentence",  sentence
+        current_tokens = []
+    
+    current_tokens.append(token)
+    
+    if len(current_tokens) > token_window_size:
+        current_tokens = current_tokens[-token_window_size:]
 
-    for match in matches:
-        print 'Found', match.span(),  match.group()
-        # candidate timex c
-        c = {'start':match.start(),  'end':match.end(),  'text':match.group()}
+    window_string = ' '.join(current_tokens)
+    print window_string
 
-        # overlap conditions:
-        # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
-        # detection for these:
-        #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
-        #  candidate includes: c.start < l.start, c.end > l.end
-        #  candidate is_included: c.start > l.start, c.end < l.end
-        #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
-        #  candidate begins: c.end < 
-        #  candidate ends:
-        #  candidate extends:
-        #  candidate precedes
-        # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
-        # names of conditions:
-        #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
-        
-        # list item l
-        added = False
-        k = 0
-        for l in doc_timexes:
-            if c['start'] == l['start'] and c['end'] == l['end']:
-                print 'Already recognised'
-                added = True
-                break
-                
-            elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
-                new_start = min(c['start'],  l['start'])
-                new_end = max(c['end'],  l['end'])
-                new_string = input_doc[new_start:new_end]
-                new_entry = {'start':new_start,  'end':new_end,  'text':new_string}
-                print 'Merged with', l['start'], '-', l['end'], l['text'],  'to',  new_entry
-                doc_timexes[k] = new_entry
-                added = True
-                break
-              
-            k += 1   
+    # feed this regex list a set of ngrams; look for complete matches.
+    for test in timex_re:
+        matches = re.compile(test,  re.I).finditer(window_string)
+
+        for match in matches:
+#            print 'Sentence %s, word %s, string "%s": ' % (sentence,  word,  window_string)
+            span = match.span()
+#            print 'Found', span,  match.group()
             
-        if not added:
-            doc_timexes.append(c)
+            # determine word numbers in the timex
+            spacePlaces = []
+            startWord = False
+            endWord = False
+            for index in findSubstrings(window_string,  ' '):
+                spacePlaces.append(index)
+            # word-4 word-3 word-2 word-1 word
+            # 0 spaceplaces[0] spaceplaces [1] spaceplaces[2] spaceplaces [3] end
+            # we would like to populate startWord and endWord
+            
+            if span[0] == 0:
+                startWord = word-len(current_tokens)+1
+            else:
+                i = 0
+                for spacePlace in spacePlaces:
+                    if span[0] == spacePlaces[i]:
+                        startWord = word-len(current_tokens)+ i + 2
+                        i += 1
+            
+            if span[1] == spacePlaces[0]:
+                endWord = word-4
+            elif span[1] == spacePlaces[1]:
+                endWord = word-3
+            elif span[1] == spacePlaces[2]:
+                endWord = word-2
+            elif span[1] == spacePlaces[3]:
+                endWord = word-1
+            elif span[1] == len(window_string):
+                endWord = word
+            else:
+                endWord = False
+            
+
+            # log doc/sentence/word id triple
+            if endWord != False and startWord != False:
+                print window_string,  span,  startWord,  '-',  endWord
+                for timexWord in range(int(startWord),  int(endWord)+1):
+                    doc_timexes.add(current_file+'.'+str(sentence)+'.'+str(timexWord))
+
+            # overlap conditions:
+            # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
+            # detection for these:
+            #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
+            #  candidate includes: c.start < l.start, c.end > l.end
+            #  candidate is_included: c.start > l.start, c.end < l.end
+            #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
+            #  candidate begins: c.end < 
+            #  candidate ends:
+            #  candidate extends:
+            #  candidate precedes
+            # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
+            # names of conditions:
+            #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
+            
+            # list item l
+#            added = False
+#            k = 0
+#            for l in doc_timexes:
+#                if c['start'] == l['start'] and c['end'] == l['end']:
+#                    print 'Already recognised'
+#                    added = True
+#                    break
+#                    
+#                elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
+#                    new_start = min(c['start'],  l['start'])
+#                    new_end = max(c['end'],  l['end'])
+#                    new_string = input_doc[new_start:new_end]
+#                    new_entry = {'start':new_start,  'end':new_end,  'text':new_string}
+#                    print 'Merged with', l['start'], '-', l['end'], l['text'],  'to',  new_entry
+#                    doc_timexes[k] = new_entry
+#                    added = True
+#                    break
+#                  
+#                k += 1   
+#                
+#            if not added:
+#                doc_timexes.append(c)
 
 print "Results:"
 for doc_timex in doc_timexes:
-    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
+#    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
+    print doc_timex
     
 dct = '19900816'
