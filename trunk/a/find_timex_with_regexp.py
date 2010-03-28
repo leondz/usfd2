@@ -13,7 +13,7 @@ def findSubstrings(text, substring):
  
 
 def addBoundary(string):
-    return '\\b' + string + '\\b'
+    return '^' + string + '$'
 
 #(minute|hour|day|week|month|quarter|year) - calendar_interval
 #((mon|tues|wednes|thurs|fri|satur|sun|to|yester)day|(mon|tue|wed|thu|fri|sat|sun)|tomorrow) - dayspec
@@ -102,67 +102,76 @@ for n in range(1, 6):
     ngrams.insert(n,  {})
     
     for docName in words.keys():
-        for sentenceIndex,  wordList in words[docName]:
-            for wordIndex,  word in words[docName][sentenceIndex][0:-(n - 1)]:
-                ngrams[n][':'.join([docName,  sentenceIndex,  wordIndex])] = words[docName][sentenceIndex][wordIndex:wordIndex + n]
+        for sentenceIndex,  wordList in enumerate(words[docName]):
+            for wordIndex,  word in enumerate(words[docName][sentenceIndex][0:-(n - 1)]):
+                ngrams[n][':'.join([docName,  str(sentenceIndex),  str(wordIndex)])] = words[docName][sentenceIndex][wordIndex:wordIndex + n]
 
-print ngrams
+print ngrams[3]['wsj_0044:4:0']
+
+
+timexes = []
 
 # feed this regex list a set of ngrams; look for complete matches.
-for test in timex_re:
-    matches = re.compile(test,  re.I).finditer(window_string)
-
-    for match in matches:
-#            print 'Sentence %s, word %s, string "%s": ' % (sentence,  word,  window_string)
-
-        # log doc/sentence/word id triple
-        if endWord != False and startWord != False:
-            print window_string,  span,  startWord,  '-',  endWord
-            for timexWord in range(int(startWord),  int(endWord)+1):
-                doc_timexes.add(current_file+'.'+str(sentence)+'.'+str(timexWord))
-
-        # overlap conditions:
-        # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
-        # detection for these:
-        #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
-        #  candidate includes: c.start < l.start, c.end > l.end
-        #  candidate is_included: c.start > l.start, c.end < l.end
-        #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
-        #  candidate begins: c.end < 
-        #  candidate ends:
-        #  candidate extends:
-        #  candidate precedes
-        # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
-        # names of conditions:
-        #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
+for n in range(1, 6):
+    for key,  wordList in ngrams[n].items():
         
-        # list item l
-#            added = False
-#            k = 0
-#            for l in doc_timexes:
-#                if c['start'] == l['start'] and c['end'] == l['end']:
-#                    print 'Already recognised'
-#                    added = True
-#                    break
-#                    
-#                elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
-#                    new_start = min(c['start'],  l['start'])
-#                    new_end = max(c['end'],  l['end'])
-#                    new_string = input_doc[new_start:new_end]
-#                    new_entry = {'start':new_start,  'end':new_end,  'text':new_string}
-#                    print 'Merged with', l['start'], '-', l['end'], l['text'],  'to',  new_entry
-#                    doc_timexes[k] = new_entry
-#                    added = True
-#                    break
-#                  
-#                k += 1   
-#                
-#            if not added:
-#                doc_timexes.append(c)
+        window_string = ' '.join(wordList)
+        
+        for test in timex_re:
+            matches = re.compile(test,  re.I).finditer(window_string)
+
+            for match in matches:
+                matchDoc,  matchSentence,  matchStart = key.split(':')
+                matchSentence,  matchStart = map(int,  [matchSentence,  matchStart])
+                matchEnd = matchStart + n - 1
+                
+                c = {'doc':matchDoc,  'sentence':matchSentence,  'start':matchStart,  'end':matchEnd}
+                # overlap conditions:
+                # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
+                # detection for these:
+                #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
+                #  candidate includes: c.start < l.start, c.end > l.end
+                #  candidate is_included: c.start > l.start, c.end < l.end
+                #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
+                #  candidate begins: c.end < 
+                #  candidate ends:
+                #  candidate extends:
+                #  candidate precedes
+                # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
+                # names of conditions:
+                #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
+                
+                # list item l
+                added = False
+                k = 0
+                for l in timexes:
+                    
+                    if c['sentence'] != l['sentence'] or c['doc'] != l['doc']:
+                        continue
+                    
+                    if c['start'] == l['start'] and c['end'] == l['end']:
+                        print 'Already recognised'
+                        added = True
+                        break
+                        
+                    elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
+                        new_start = min(c['start'],  l['start'])
+                        new_end = max(c['end'],  l['end'])
+                        new_string = words[c['doc']][c['sentence']][new_start:new_end]
+                        new_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':new_start,  'end':new_end}
+                        print 'Merged with', l['start'], '-', l['end'], 'to',  new_entry
+                        timexes[k] = new_entry
+                        added = True
+                        break
+                      
+                    k += 1
+                    
+                if not added:
+                    timexes.append(c)
 
 print "Results:"
-for doc_timex in doc_timexes:
+for t in timexes:
 #    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
-    print doc_timex
+    print t,  ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
 
 dct = '19900816'
