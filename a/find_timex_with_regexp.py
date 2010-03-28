@@ -94,6 +94,8 @@ for line in file:
     
     words[filename][sentence].insert(word,  token)
 
+file.close()
+
 # ngrams[0] is empty; ngrams[1] contains unigrams; ngrams [2] bigrams, and so on.
 ngrams = []
 ngrams.insert(0,  [])
@@ -143,8 +145,7 @@ for n in range(1, 6):
                 
                 # list item l
                 added = False
-                k = 0
-                for l in timexes:
+                for k, l in enumerate(timexes):
                     
                     if c['sentence'] != l['sentence'] or c['doc'] != l['doc']:
                         continue
@@ -163,7 +164,7 @@ for n in range(1, 6):
                         timexes[k] = new_entry
                         added = True
                         break
-                      
+                
                     k += 1
                     
                 if not added:
@@ -172,6 +173,15 @@ for n in range(1, 6):
 print "Results:"
 for t in timexes:
 #    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
-    print t,  ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    print t['doc'], t['sentence'], t['start'], t['end'],   ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
 
-dct = '19900816'
+
+
+# read in DCTs for anchoring
+dct = {}
+
+file = open('/home/leon/time/tempeval2-trial/data/english/dct.tab')
+for line in file:
+    docName,  docDct = line.strip().lower().split('\t')
+    dct[docName] = docDct
+
