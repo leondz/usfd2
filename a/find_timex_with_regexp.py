@@ -77,96 +77,66 @@ timex_re = map(addBoundary, timex_re)
 
 file = open('/home/leon/time/tempeval2-trial/data/english/base-segmentation.tab')
 
-current_tokens = []
 current_file = ''
-token_window_size = 5
-doc_timexes = set()
+
+words = {}
 
 for line in file:
     filename,  sentence,  word,  token = line.strip().split('\t')
-
+    sentence,  word = map(int,  [sentence,  word])
+    
     if filename != current_file:
-        print "New file:",  filename
+        words[filename] = []
         current_file = filename
     
-    word = int(word)
-    
     if word == 0:
-        print "New sentence",  sentence
-        current_tokens = []
+        words[filename].insert(sentence,  [])
     
-    current_tokens.append(token)
+    words[filename][sentence].insert(word,  token)
+
+# ngrams[0] is empty; ngrams[1] contains unigrams; ngrams [2] bigrams, and so on.
+ngrams = []
+ngrams.insert(0,  [])
+
+for n in range(1, 6):
+    ngrams.insert(n,  {})
     
-    if len(current_tokens) > token_window_size:
-        current_tokens = current_tokens[-token_window_size:]
+    for docName in words.keys():
+        for sentenceIndex,  wordList in words[docName]:
+            for wordIndex,  word in words[docName][sentenceIndex][0:-(n - 1)]:
+                ngrams[n][':'.join([docName,  sentenceIndex,  wordIndex])] = words[docName][sentenceIndex][wordIndex:wordIndex + n]
 
-    window_string = ' '.join(current_tokens)
-    print window_string
+print ngrams
 
-    # feed this regex list a set of ngrams; look for complete matches.
-    for test in timex_re:
-        matches = re.compile(test,  re.I).finditer(window_string)
+# feed this regex list a set of ngrams; look for complete matches.
+for test in timex_re:
+    matches = re.compile(test,  re.I).finditer(window_string)
 
-        for match in matches:
+    for match in matches:
 #            print 'Sentence %s, word %s, string "%s": ' % (sentence,  word,  window_string)
-            span = match.span()
-#            print 'Found', span,  match.group()
-            
-            # determine word numbers in the timex
-            spacePlaces = []
-            startWord = False
-            endWord = False
-            for index in findSubstrings(window_string,  ' '):
-                spacePlaces.append(index)
-            # word-4 word-3 word-2 word-1 word
-            # 0 spaceplaces[0] spaceplaces [1] spaceplaces[2] spaceplaces [3] end
-            # we would like to populate startWord and endWord
-            
-            if span[0] == 0:
-                startWord = word-len(current_tokens)+1
-            else:
-                i = 0
-                for spacePlace in spacePlaces:
-                    if span[0] == spacePlaces[i]:
-                        startWord = word-len(current_tokens)+ i + 2
-                        i += 1
-            
-            if span[1] == spacePlaces[0]:
-                endWord = word-4
-            elif span[1] == spacePlaces[1]:
-                endWord = word-3
-            elif span[1] == spacePlaces[2]:
-                endWord = word-2
-            elif span[1] == spacePlaces[3]:
-                endWord = word-1
-            elif span[1] == len(window_string):
-                endWord = word
-            else:
-                endWord = False
-            
 
-            # log doc/sentence/word id triple
-            if endWord != False and startWord != False:
-                print window_string,  span,  startWord,  '-',  endWord
-                for timexWord in range(int(startWord),  int(endWord)+1):
-                    doc_timexes.add(current_file+'.'+str(sentence)+'.'+str(timexWord))
+        # log doc/sentence/word id triple
+        if endWord != False and startWord != False:
+            print window_string,  span,  startWord,  '-',  endWord
+            for timexWord in range(int(startWord),  int(endWord)+1):
+                doc_timexes.add(current_file+'.'+str(sentence)+'.'+str(timexWord))
 
-            # overlap conditions:
-            # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
-            # detection for these:
-            #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
-            #  candidate includes: c.start < l.start, c.end > l.end
-            #  candidate is_included: c.start > l.start, c.end < l.end
-            #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
-            #  candidate begins: c.end < 
-            #  candidate ends:
-            #  candidate extends:
-            #  candidate precedes
-            # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
-            # names of conditions:
-            #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
-            
-            # list item l
+        # overlap conditions:
+        # listitem, candidate. we can have: candidate early_overlap, candidate includes, candidate is_included, candidate late_overlap
+        # detection for these:
+        #  candidate early_overlap: c.start < l.start, c.end > l.start, c.end < l.end
+        #  candidate includes: c.start < l.start, c.end > l.end
+        #  candidate is_included: c.start > l.start, c.end < l.end
+        #  candidate late_overlap: c.start > l.start, c.start < l.end, c.end > l.end
+        #  candidate begins: c.end < 
+        #  candidate ends:
+        #  candidate extends:
+        #  candidate precedes
+        # basically, we want to know if our candidate timex has any points within the bounds of anything in the list. If so, we will extend the list item's boundaries.
+        # names of conditions:
+        #  candidate start early; candidate start late; candidate end early; candidate end late; candidate end during; candidate start during
+        
+        # list item l
 #            added = False
 #            k = 0
 #            for l in doc_timexes:
@@ -194,5 +164,5 @@ print "Results:"
 for doc_timex in doc_timexes:
 #    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
     print doc_timex
-    
+
 dct = '19900816'
