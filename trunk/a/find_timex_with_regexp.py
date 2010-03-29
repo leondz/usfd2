@@ -118,6 +118,7 @@ for n in range(1, 6):
 timexes = []
 
 # feed this regex list a set of ngrams; look for complete matches.
+tid = 0
 for n in range(1, 6):
     for key,  wordList in ngrams[n].items():
         
@@ -162,7 +163,8 @@ for n in range(1, 6):
                         new_start = min(c['start'],  l['start'])
                         new_end = max(c['end'],  l['end'])
                         new_string = words[c['doc']][c['sentence']][new_start:new_end]
-                        new_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':new_start,  'end':new_end}
+                        new_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':new_start,  'end':new_end,  'tid':tid}
+                        tid += 1
 #                        print 'Merged with', l['start'], '-', l['end'], 'to',  new_entry
                         timexes[k] = new_entry
                         added = True
@@ -171,7 +173,10 @@ for n in range(1, 6):
                     k += 1
                     
                 if not added:
+                    c['tid'] = tid
+                    tid += 1
                     timexes.append(c)
+
 
 print "Results:"
 for t in timexes:
@@ -181,9 +186,9 @@ for t in timexes:
 
 
 extentsOut = open(extentsFile,  'w')
-for tid,  t in enumerate(timexes):
+for t in timexes:
     for wordPosition in range(t['start'],  t['end'] + 1):
-        extentsOut.write('\t'.join([t['doc'],  str(t['sentence']),  str(wordPosition),  'timex3',  't'+str(tid), '1']) + '\n')
+        extentsOut.write('\t'.join([t['doc'],  str(t['sentence']),  str(wordPosition),  'timex3',  't'+str(t['tid']), '1']) + '\n')
 extentsOut.close
 
 # read in DCTs for anchoring
@@ -201,7 +206,7 @@ attrs = []
 durationRx = re.compile(r'\b(for|during)\b',  re.I)
 numbersRx = re.compile(r'^[0-9]+ ')
 
-for tid,  t in enumerate(timexes):
+for t in timexes:
     timexString = ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
     
     timexType = ''
@@ -289,16 +294,14 @@ for tid,  t in enumerate(timexes):
             elif period == 'H':
                 timexDate += timedelta(hours = -1)
     
-    t['tid'] = str(tid)
     
     # add one entry per attribute    
     if timexType:
         t['attr'] = 'type'
         t['value'] = timexType
-        attrs.append(t)
+        attrs.append(t.copy())
     
     if timexValue:
-        t['attr'] = 'value'
         
         if timexType == 'DURATION':
             timexValue = 'P' + distance + period
@@ -309,14 +312,15 @@ for tid,  t in enumerate(timexes):
                 timexValue = timexDate.month
             else:
                 timexValue = timexDate
-            
+        
+        t['attr'] = 'value'
         t['value'] = str(timexValue)
-        attrs.append(t)
+        attrs.append(t.copy())
 
     print timexString,  timexType,  timexValue
     
 
 attribsOut= open(attribsFile,  'w')
 for attr in attrs:
-    attribsOut.write('\t'.join([attr['doc'],  str(attr['sentence']),  str(wordPosition),  'timex3',  't'+attr['tid'], '1',  attr['attr'],  attr['value']]) + '\n')
+    attribsOut.write('\t'.join([attr['doc'],  str(attr['sentence']),  str(attr['start']),  'timex3',  't'+str(attr['tid']), '1',  attr['attr'],  attr['value']]) + '\n')
 attribsOut.close()
