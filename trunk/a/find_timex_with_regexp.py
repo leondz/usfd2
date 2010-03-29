@@ -329,7 +329,7 @@ for t in timexes:
             if period == 'Y':
                 timexValue = timexDate.year
             elif period in ['Q',  'M']:
-                timexValue = timexDate.month
+                timexValue = '-'.join(map(str, [timexDate.year, '%02d' % (timexDate.month)]))
             else:
                 timexValue = timexDate
         
