@@ -37,10 +37,14 @@ def addBoundary(string):
 #(a|`textual number`) `calendar_interval`s? (earlier|later|previous|ago|since)
 #`monthspec`.? `shortyear`
 
-segmentationFile = '/home/leon/time/tempeval2/training/data/english/base-segmentation.tab'
-dctFile = '/home/leon/time/tempeval2/training/data/english/dct.tab'
+segmentationFile = '/home/leon/time/tempeval2/test/english/relations/base-segmentation.tab'
+dctFile = '/home/leon/time/tempeval2/test/english/entities/dcts-test-en.tab'
 extentsFile = 'usfd2-timex-extents'
 attribsFile = 'usfd2-timex-attribs'
+
+futureLimit = 14
+
+months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 
 calendar_interval = "(minute|hour|day|weekend|week|month|quarter|year)"
 longdays = "((mon|tues|wednes|thurs|fri|satur|sun|to|yester)day|tomorrow)"
@@ -196,10 +200,9 @@ dcts = {}
 
 file = open(dctFile)
 for line in file:
-    docName,  docDct = line.strip().lower().split('\t')
+    docName,  docDct = line.strip().split('\t')
     dct = date(int(docDct[0:4]),  int(docDct[4:6]),  int(docDct[6:8]))
     dcts[docName] = dct
-
 
 
 attrs = []
@@ -211,8 +214,11 @@ for t in timexes:
     
     timexType = ''
     previous3Words = ' '.join(words[t['doc']][t['sentence']][t['start']-3:t['start']-1])
-    
-    if durationRx.search(previous3Words) or timexString[-1:] == 's': # to catch e.g. "for 6 months"
+
+    # e.g. "for 6 months" - duration
+    # a year ago - date
+    # a year - duration
+    if durationRx.search(previous3Words) or timexString[-1:] == 's' or (timexString[0:2].lower() == 'a ' and timexString.count(' ') < 2): 
         timexType = 'DURATION'
     else:
         timexType = 'DATE'
@@ -225,7 +231,7 @@ for t in timexes:
     timexValue = 'P'
     
     distance = ''
-    if timexString.lower().find('one ') != -1:
+    if timexString.lower().find('one ') != -1 or timexString.lower().find('next ') != -1:
         distance = '1'
     elif timexString.lower().find('two ') != -1:
         distance = '2'
@@ -249,6 +255,9 @@ for t in timexes:
         distance = -1
     else:
         distance = 'X'
+    
+    if distance and distance != 'X' and int(distance) > 0 and (timexString.lower().find('earlier') > -1 or timexString.lower().find('ago') > -1):
+        distance = str(-int(distance))
     
     period = ''
     if not timexValueComplete:
@@ -280,19 +289,30 @@ for t in timexes:
     if timexType == 'DATE':
         timexDate = dcts[t['doc']]
         
-        if distance == -1:
+        if timexString[0:3].lower() in months:
+            timexMonth = timexString[0:3].lower();
+            _x,  dayNumber = timexString.split(' ')
+            timexDate = timexDate.replace(month=(months.index(timexMonth)+1))
+            timexDate = timexDate.replace(day=int(dayNumber))
+            
+            daysInFuture = (timexDate - dcts[t['doc']]).days
+            if daysInFuture > futureLimit:
+                timexDate = timexDate.replace(year = timexDate.year - 1)
+
+        elif distance and distance != 'X':
+            distance = int(distance)
             if period == 'Y':
-                timexDate += timedelta(days = -365)
+                timexDate += timedelta(days = 365*distance)
             elif period == 'Q':
-                timexDate += timedelta(months = -3)
+                timexDate += timedelta(days = 90*distance)
             elif period == 'M':
-                timexDate += timedelta(months = -1)
+                timexDate += timedelta(days = 30*distance)
             elif period == 'W':
-                timexDate += timedelta(weeks = -1)
+                timexDate += timedelta(weeks = 1*distance)
             elif period == 'D':
-                timexDate += timedelta(days = -1)
+                timexDate += timedelta(days = 1*distance)
             elif period == 'H':
-                timexDate += timedelta(hours = -1)
+                timexDate += timedelta(hours = 1*distance)
     
     
     # add one entry per attribute    
@@ -324,3 +344,4 @@ attribsOut= open(attribsFile,  'w')
 for attr in attrs:
     attribsOut.write('\t'.join([attr['doc'],  str(attr['sentence']),  str(attr['start']),  'timex3',  't'+str(attr['tid']), '1',  attr['attr'],  attr['value']]) + '\n')
 attribsOut.close()
+
