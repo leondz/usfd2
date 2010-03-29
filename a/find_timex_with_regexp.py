@@ -1,4 +1,5 @@
 import re
+from datetime import date,  timedelta
 
 def findSubstrings(text, substring):
     # position pos (index) is moved up for each call to this generator
@@ -36,6 +37,11 @@ def addBoundary(string):
 #(a|`textual number`) `calendar_interval`s? (earlier|later|previous|ago|since)
 #`monthspec`.? `shortyear`
 
+segmentationFile = '/home/leon/time/tempeval2/training/data/english/base-segmentation.tab'
+dctFile = '/home/leon/time/tempeval2/training/data/english/dct.tab'
+extentsFile = 'usfd2-timex-extents'
+attribsFile = 'usfd2-timex-attribs'
+
 calendar_interval = "(minute|hour|day|weekend|week|month|quarter|year)"
 longdays = "((mon|tues|wednes|thurs|fri|satur|sun|to|yester)day|tomorrow)"
 dayspec = "("+longdays+"|(mon|tue|wed|thu|fri|sat|sun))"
@@ -72,10 +78,11 @@ timex_re.append("("+vague+" "+textual_number+" "+calendar_interval+")")
 timex_re.append("(("+times+"( "+longdays+")?)|("+longdays+" "+times+"))")
 timex_re.append("("+monthspec+"\.? [0-3]?[0-9](st|nd|rd|th)?)")
 
+
 timex_re = map(addBoundary, timex_re)
 #timex_re = map(re.compile, timex_re)
 
-file = open('/home/leon/time/tempeval2-trial/data/english/base-segmentation.tab')
+file = open(segmentationFile)
 
 current_file = ''
 
@@ -107,9 +114,6 @@ for n in range(1, 6):
         for sentenceIndex,  wordList in enumerate(words[docName]):
             for wordIndex,  word in enumerate(words[docName][sentenceIndex][0:-(n - 1)]):
                 ngrams[n][':'.join([docName,  str(sentenceIndex),  str(wordIndex)])] = words[docName][sentenceIndex][wordIndex:wordIndex + n]
-
-print ngrams[3]['wsj_0044:4:0']
-
 
 timexes = []
 
@@ -151,7 +155,6 @@ for n in range(1, 6):
                         continue
                     
                     if c['start'] == l['start'] and c['end'] == l['end']:
-                        print 'Already recognised'
                         added = True
                         break
                         
@@ -160,7 +163,7 @@ for n in range(1, 6):
                         new_end = max(c['end'],  l['end'])
                         new_string = words[c['doc']][c['sentence']][new_start:new_end]
                         new_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':new_start,  'end':new_end}
-                        print 'Merged with', l['start'], '-', l['end'], 'to',  new_entry
+#                        print 'Merged with', l['start'], '-', l['end'], 'to',  new_entry
                         timexes[k] = new_entry
                         added = True
                         break
@@ -173,15 +176,147 @@ for n in range(1, 6):
 print "Results:"
 for t in timexes:
 #    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
-    print t['doc'], t['sentence'], t['start'], t['end'],   ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    timexString = ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    print t['doc'], t['sentence'], t['start'], t['end'],   timexString
 
 
+extentsOut = open(extentsFile,  'w')
+for tid,  t in enumerate(timexes):
+    for wordPosition in range(t['start'],  t['end'] + 1):
+        extentsOut.write('\t'.join([t['doc'],  str(t['sentence']),  str(wordPosition),  'timex3',  't'+str(tid), '1']) + '\n')
+extentsOut.close
 
 # read in DCTs for anchoring
-dct = {}
+dcts = {}
 
-file = open('/home/leon/time/tempeval2-trial/data/english/dct.tab')
+file = open(dctFile)
 for line in file:
     docName,  docDct = line.strip().lower().split('\t')
-    dct[docName] = docDct
+    dct = date(int(docDct[0:4]),  int(docDct[4:6]),  int(docDct[6:8]))
+    dcts[docName] = dct
 
+
+
+attrs = []
+durationRx = re.compile(r'\b(for|during)\b',  re.I)
+numbersRx = re.compile(r'^[0-9]+ ')
+
+for tid,  t in enumerate(timexes):
+    timexString = ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    
+    timexType = ''
+    previous3Words = ' '.join(words[t['doc']][t['sentence']][t['start']-3:t['start']-1])
+    
+    if durationRx.search(previous3Words) or timexString[-1:] == 's': # to catch e.g. "for 6 months"
+        timexType = 'DURATION'
+    else:
+        timexType = 'DATE'
+    
+    timexValue = None
+    if timexString.lower == 'today' or timexString.lower == 'now':
+        timexValue = 'PRESENT_REF'
+    
+    timexValueComplete = False
+    timexValue = 'P'
+    
+    distance = ''
+    if timexString.lower().find('one ') != -1:
+        distance = '1'
+    elif timexString.lower().find('two ') != -1:
+        distance = '2'
+    elif timexString.lower().find('three ') != -1:
+        distance = '3'
+    elif timexString.lower().find('four ') != -1:
+        distance = '4'
+    elif timexString.lower().find('five ') != -1:
+        distance = '5'
+    elif timexString.lower().find('six ') != -1:
+        distance = '6'
+    elif timexString.lower().find('seven ') != -1:
+        distance = '7'
+    elif timexString.lower().find('eight ') != -1:
+        distance = '8'
+    elif timexString.lower().find('nine ') != -1:
+        distance = '9'
+    elif timexString.lower().find('ten ') != -1:
+        distance = '10'
+    elif timexString.lower().find('last ') != -1 or timexString.lower().find('earlier') != -1:
+        distance = -1
+    else:
+        distance = 'X'
+    
+    period = ''
+    if not timexValueComplete:
+        if timexString.lower().find('year') != -1:
+            period = 'Y'
+        elif timexString.lower().find('quarter') != -1:
+            period = 'Q'
+        elif timexString.lower().find('month') != -1:
+            period = 'M'
+        elif timexString.lower().find('week') != -1:
+            period = 'W'
+        elif timexString.lower().find('day') != -1:
+            period = 'D'
+        elif timexString.lower().find('hour') != -1:
+            period = 'H'
+        else:
+            period = 'X'
+
+    m = numbersRx.match(timexString)
+    if m:
+        distance = m.group()[:-1]
+
+    if distance == -1 and timexType == 'DURATION':
+        if timexString[-1:] == 's':
+            distance = 'X'
+        else:
+            distance = '1'
+
+    if timexType == 'DATE':
+        timexDate = dcts[t['doc']]
+        
+        if distance == -1:
+            if period == 'Y':
+                timexDate += timedelta(days = -365)
+            elif period == 'Q':
+                timexDate += timedelta(months = -3)
+            elif period == 'M':
+                timexDate += timedelta(months = -1)
+            elif period == 'W':
+                timexDate += timedelta(weeks = -1)
+            elif period == 'D':
+                timexDate += timedelta(days = -1)
+            elif period == 'H':
+                timexDate += timedelta(hours = -1)
+    
+    t['tid'] = str(tid)
+    
+    # add one entry per attribute    
+    if timexType:
+        t['attr'] = 'type'
+        t['value'] = timexType
+        attrs.append(t)
+    
+    if timexValue:
+        t['attr'] = 'value'
+        
+        if timexType == 'DURATION':
+            timexValue = 'P' + distance + period
+        elif timexType == 'DATE':
+            if period == 'Y':
+                timexValue = timexDate.year
+            elif period in ['Q',  'M']:
+                timexValue = timexDate.month
+            else:
+                timexValue = timexDate
+            
+        t['value'] = str(timexValue)
+        attrs.append(t)
+
+    print timexString,  timexType,  timexValue
+    
+
+attribsOut= open(attribsFile,  'w')
+for attr in attrs:
+    attribsOut.write('\t'.join([attr['doc'],  str(attr['sentence']),  str(wordPosition),  'timex3',  't'+attr['tid'], '1',  attr['attr'],  attr['value']]) + '\n')
+attribsOut.close()
