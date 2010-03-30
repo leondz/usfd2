@@ -1,0 +1,6 @@
+#!/bin/sh
+EVAL_DIR=/home/leon/time/tempeval2/test/english/relations
+cd /tmp
+py ~leon/time/usfd2/a.py
+py ~leon/time/tempeval2/scorer/score_entities.py $EVAL_DIR/base-segmentation.tab $EVAL_DIR/timex-extents.tab /tmp/usfd2-timex-attribs $EVAL_DIR/timex-attributes.tab /tmp/usfd2-timex-attribs
+
