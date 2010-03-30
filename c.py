@@ -14,6 +14,13 @@ trainTlinks = tempEval2.readRelations(trainPath + 'tlinks-timex-event.tab')
 
 signals = tempEval2.readSignalHints('signals.tab')
 
+testWords = tempEval2.readSegmentation(testPath + 'base-segmentation.tab')
+testTimexExtents = tempEval2.readExtents(testPath + 'timex-extents.tab')
+testEventExtents = tempEval2.readExtents(testPath + 'event-extents.tab')
+testTimexAttribs = tempEval2.readAttributes(testPath + 'timex-attributes.tab')
+testEventAttribs = tempEval2.readAttributes(testPath + 'event-attributes.tab')
+
+
 
 # get most-common-relation in training data
 classDistr = {}
@@ -52,13 +59,13 @@ for document in trainTlinks:
         else:
             arg2 = trainTimexAttribs[document][relation['to']]
 
-        features['arg1word'] = arg1['startWord']
-        features['arg1type'] = arg1['type']
+        features['arg1by5'] = (int(arg1['startWord']) + 4) / 5
+        features['arg1intervalType'] = arg1['type']
         for k, v in arg1['a'].items():
             features['arg1'+k] = v
 
-        features['arg2word'] = arg2['startWord']
-        features['arg2type'] = arg2['type']
+        features['arg2by5'] = (int(arg2['startWord']) + 4) / 5
+        features['arg2intervalType'] = arg2['type']
         for k, v in arg1['a'].items():
             features['arg2'+k] = v
         
@@ -68,7 +75,6 @@ for document in trainTlinks:
 
 classifier = nltk.MaxentClassifier.train(examples)
 
-die
 
 # per sentence, look for sentences that contain both a timex and an event
 #   fantastic! we will create a relation between these two.
@@ -85,16 +91,19 @@ relations = {}
 # when there are, look at the events in the document and see if there are any in this sentence
 # if so, add an empty pair to relations; we have a same-sentence event-timex relation.
 
-for document in trainWords:
+for document in testWords:
     relations[document] = {}
-    if document in trainTimexExtents.keys() and document in trainEventExtents.keys():
+    if document in testTimexExtents.keys() and document in testEventExtents.keys():
         for sentence in document:
-            for timex in trainTimexExtents[document]:
-                if trainTimexExtents[document][timex]['sentence'] == sentence:
-                        for event in trainEventExtents[document]:
-                            if trainEventExtents[document][event]['sentence'] == sentence:
+            for timex in testTimexExtents[document]:
+                if testTimexExtents[document][timex]['sentence'] == sentence:
+                        for event in testEventExtents[document]:
+                            if testEventExtents[document][event]['sentence'] == sentence:
                                 relations[document][event + '-' + timex] = {}
-    
+
+
+outfile = open('tlinks-timex-event.tab',  'w')
+
 for document,  docRelations in relations.items():
     if docRelations == {}:
         del relations[document]
@@ -102,26 +111,49 @@ for document,  docRelations in relations.items():
     
     for relationId,  relationData in docRelations.items():
         eventId,  timexId = relationId.split('-')
-        sentence = int(trainTimexExtents[document][timexId]['sentence'])
-        timexStart = int(trainTimexExtents[document][timexId]['start'])
-        eventStart = int(trainEventExtents[document][eventId]['start'])
-        sentenceText = ' '.join(trainWords[document][sentence].values())
-        print '%s: %s-%s in sentence %s; timex @ %s "%s", event @ %s "%s"' % (document,  eventId,  timexId,  sentence,  timexStart,  trainWords[document][sentence][timexStart],  eventStart,  trainWords[document][sentence][eventStart])
+        event = testEventAttribs[document][eventId]
+        timex = testTimexAttribs[document][timexId]
+        sentence = int(testTimexExtents[document][timexId]['sentence'])
+        timexStart = int(timex['startWord'])
+        eventStart = int(event['startWord'])
+        sentenceText = ' '.join(testWords[document][sentence].values())
+        print '%s: %s-%s in sentence %s; timex @ %s "%s", event @ %s "%s"' % (document,  eventId,  timexId,  sentence,  timexStart,  testWords[document][sentence][timexStart],  eventStart,  testWords[document][sentence][eventStart])
         
         signalHint = {}
         sentenceSignals = [] # list of word positions where signals are found
         for signal in signals:
-            for position,  word in trainWords[document][sentence].items():
+            for position,  word in testWords[document][sentence].items():
                 if word.lower() == signal:
                     sentenceSignals.append(position)
         
         if sentenceSignals:
             print sentenceText
             for signalPosition in sentenceSignals:
-                print trainWords[document][sentence][signalPosition],  '@',  signalPosition
+                print testWords[document][sentence][signalPosition],  '@',  signalPosition
         
         if len(sentenceSignals) > 1:
             #pick signal closest to event/timex midpoint
             pass
         
-    
+        
+        # represent this pair as a feature list
+        features = {}
+        features['arg1by5'] = (int(event['startWord']) + 4) / 5
+        features['arg1intervalType'] = event['type']
+        for k, v in event['a'].items():
+            features['arg1'+k] = v
+        
+        features['arg2by5'] = (int(timex['startWord']) + 4) / 5
+        features['arg2intervalType'] = timex['type']
+        for k, v in timex['a'].items():
+            features['arg2'+k] = v
+        
+        
+        classification = classifier.classify(features)
+        
+        outfile.write('\t'.join([document, eventId,  timexId,  classification])+'\n')
+
+
+outfile.close()
+
+classifier.show_most_informative_features(5)
