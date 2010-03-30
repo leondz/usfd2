@@ -1,0 +1,42 @@
+before	before
+when	overlap
+after	after
+later	before
+then	before
+until	before
+once	overlap-or-after
+during	overlap
+as soon as	overlap-or-after
+followed	after
+already	before-or-overlap
+within	overlap
+subsequent	before
+since	overlap-or-after
+prior to	before
+subsequently	before
+during and after	overlap-or-after
+meanwhile	overlap
+at least until	before-or-overlap
+previously	after
+ended	overlap-or-after
+prior	after
+still	overlap-or-after
+earlier	after
+followed by	before
+immediately	overlap
+pending	before-or-overlap
+while	overlap
+following	after
+at the same time	overlap
+ending	overlap-or-after
+shortly before	before
+previous	after
+ahead of	before
+so far	overlap
+thereafter	before
+in anticipation of	before
+follows	after
+since then	before
+soon after	after
+as of	overlap-or-after
+throughout	overlap

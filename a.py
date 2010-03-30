@@ -1,5 +1,7 @@
 import re
 from datetime import date,  timedelta
+import tempEval2
+
 
 def findSubstrings(text, substring):
     # position pos (index) is moved up for each call to this generator
@@ -39,8 +41,8 @@ def addBoundary(string):
 
 segmentationFile = '/home/leon/time/tempeval2/test/english/relations/base-segmentation.tab'
 dctFile = '/home/leon/time/tempeval2/test/english/entities/dcts-test-en.tab'
-extentsFile = 'usfd2-timex-extents'
-attribsFile = 'usfd2-timex-attribs'
+extentsFile = 'timex-extents.tab'
+attribsFile = 'timex-attributes.tab'
 
 futureLimit = 14
 
@@ -86,26 +88,7 @@ timex_re.append("("+monthspec+"\.? [0-3]?[0-9](st|nd|rd|th)?)")
 timex_re = map(addBoundary, timex_re)
 #timex_re = map(re.compile, timex_re)
 
-file = open(segmentationFile)
-
-current_file = ''
-
-words = {}
-
-for line in file:
-    filename,  sentence,  word,  token = line.strip().split('\t')
-    sentence,  word = map(int,  [sentence,  word])
-    
-    if filename != current_file:
-        words[filename] = []
-        current_file = filename
-    
-    if word == 0:
-        words[filename].insert(sentence,  [])
-    
-    words[filename][sentence].insert(word,  token)
-
-file.close()
+words = tempEval2.readSegmentation(segmentationFile)
 
 # ngrams[0] is empty; ngrams[1] contains unigrams; ngrams [2] bigrams, and so on.
 ngrams = []
