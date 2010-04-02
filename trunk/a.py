@@ -39,8 +39,8 @@ def addBoundary(string):
 #(a|`textual number`) `calendar_interval`s? (earlier|later|previous|ago|since)
 #`monthspec`.? `shortyear`
 
-segmentationFile = '/home/leon/time/tempeval2/test/english/relations/base-segmentation.tab'
-dctFile = '/home/leon/time/tempeval2/test/english/entities/dcts-test-en.tab'
+segmentationFile = '/home/leon/time/tempeval2/test/english/entities/base-segmentation.tab'
+dctFile = '/home/leon/time/tempeval2/test/english/dct.txt'
 extentsFile = 'timex-extents.tab'
 attribsFile = 'timex-attributes.tab'
 
@@ -110,7 +110,13 @@ for n in range(1, 6):
     for docName in words.keys():
         for sentenceIndex,  wordList in enumerate(words[docName]):
             sentenceList = buildSentenceList(words[docName][sentenceIndex])
-            for wordIndex,  word in enumerate(sentenceList[0:-(n - 1)]):
+            
+            if n == 1:
+                maxBound = len(sentenceList)
+            else:
+                maxBound = -(n - 1)
+                
+            for wordIndex,  word in enumerate(sentenceList[0:maxBound]):
                 ngrams[n][':'.join([docName,  str(sentenceIndex),  str(wordIndex)])] = sentenceList[wordIndex:wordIndex + n]
 
 timexes = []
@@ -288,10 +294,17 @@ for t in timexes:
         timexDate = dcts[t['doc']]
         
         if timexString[0:3].lower() in months:
+            
+            if timexString == 'may': # if not capitalised, ignore it
+                continue
+            
             timexMonth = timexString[0:3].lower();
-            _x,  dayNumber = timexString.split(' ')
-            timexDate = timexDate.replace(month=(months.index(timexMonth)+1))
-            timexDate = timexDate.replace(day=int(dayNumber))
+            if timexString.find(' ') != -1:
+                _x,  dayNumber = timexString.split(' ')
+                timexDate = timexDate.replace(month=(months.index(timexMonth)+1))
+                timexDate = timexDate.replace(day=int(dayNumber))
+            else:
+                period = 'M'
             
             daysInFuture = (timexDate - dcts[t['doc']]).days
             if daysInFuture > futureLimit:
