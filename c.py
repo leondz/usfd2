@@ -3,7 +3,10 @@ import nltk
 import nltk.classify.maxent
 
 trainPath = '/home/leon/time/tempeval2/training2/english/data/'
+#testPath = '/home/leon/time/tempeval2/training2/english/data/'
 testPath = '/home/leon/time/tempeval2/test/english/relations/'
+
+linksFile = 'tlinks-timex-event.tab'
 
 trainWords = tempEval2.readSegmentation(trainPath + 'base-segmentation.tab')
 trainTimexExtents = tempEval2.readExtents(trainPath + 'timex-extents.tab')
@@ -49,15 +52,23 @@ for document in trainTlinks:
         
         relType = relation['relType']
         
+        arg1id,  arg2id = relation['from'],  relation['to']
+        
         if relation['from'][0] == 'e':
             arg1 = trainEventAttribs[document][relation['from']]
+            arg1sentence = int(trainEventExtents[document][arg1id]['sentence'])
         else:
             arg1 = trainTimexAttribs[document][relation['from']]
+            arg1sentence = int(trainTimexExtents[document][arg1id]['sentence'])
 
         if relation['to'][0] == 'e':
             arg2 = trainEventAttribs[document][relation['to']]
+            arg2sentence = int(trainEventExtents[document][arg2id]['sentence'])
         else:
             arg2 = trainTimexAttribs[document][relation['to']]
+            arg2sentence = int(trainTimexExtents[document][arg2id]['sentence'])
+
+
 
         features['arg1by5'] = (int(arg1['startWord']) + 4) / 5
         features['arg1intervalType'] = arg1['type']
@@ -69,6 +80,63 @@ for document in trainTlinks:
         for k, v in arg1['a'].items():
             features['arg2'+k] = v
         
+        features['arg1word'] = trainWords[document][int(arg1['sentence'])][int(arg1['startWord'])]
+        features['arg2word'] = trainWords[document][int(arg2['sentence'])][int(arg2['startWord'])]
+        # include associated signal - so we need to do signal scanning + assoc for this sentence
+        
+        if relation['to'][0] == 'e' and relation['from'][0] == 'e':
+            if arg1['a']['TENSE'] == arg2['a']['TENSE']:
+                features['sameTense'] == True
+            else:
+                features['sameTense'] == False
+            
+            if arg1['a']['ASPECT'] == arg2['a']['ASPECT']:
+                features['sameAspect'] == True
+            else:
+                features['sameAspect'] == False
+        
+        
+        if arg2sentence < arg1sentence:
+            features['e1e2'] = False
+        elif arg1sentence == arg2sentence and arg2['startWord'] < arg1['startWord']:
+            features['e1e2'] = False
+        else:
+            features['e1e2'] = True
+        
+        
+        signalHint1 = 'none'
+        # this will hold two values; [distance_from_arg, absolute_offset]
+        nearestSignal1 = [9999, -1]
+        signalHint2 = 'none'
+        nearestSignal2 = [9999,  -1]
+        
+        arg1sentenceText = ' '.join(trainWords[document][arg1sentence].values())
+        arg2sentenceText = ' '.join(trainWords[document][arg1sentence].values())
+        
+        for signal,  _x in signals.items():
+            signalPos1 = arg1sentenceText.lower().find(signal)
+            signalPos2 = arg2sentenceText.lower().find(signal)
+            
+            if signalPos1 != -1:
+                sigDist = abs(signalPos1 - int(arg1['startWord']))
+                if sigDist < nearestSignal1[0]:
+                    nearestSignal = [sigDist,  signalPos1]
+            
+            if signalPos2 != -1:
+                sigDist = abs(signalPos2 - int(arg2['startWord']))
+                if sigDist < nearestSignal2[0]:
+                    nearestSignal = [sigDist,  signalPos2]
+        
+        if nearestSignal1[1] != -1:
+            signalHint1 = signals[trainWords[document][arg1sentence][nearestSignal1[1]]]
+            features['arg1signal'] = nearestSignal1[1] - arg1['startWord']
+        
+        if nearestSignal2[1] != -1:
+            signalHint2 = signals[trainWords[document][arg2sentence][nearestSignal2[1]]]
+            features['signalarg2'] = arg2['startWord'] - nearestSignal2[1]
+        
+        features['signalHint1'] = signalHint1
+        features['signalHint2'] = signalHint2
         
         examples.append((features,  relType))
 
@@ -83,77 +151,130 @@ classifier = nltk.MaxentClassifier.train(examples)
 #       add a relation and its source. maybe we can have a set of weighted probabilities for each relation? 
 #       e.g. rels[doc][event-timex][{src:signal suggestions:{before:1}}, {src:maxent suggestions:{before:0.7, overlap:0.3}, {src:mcc suggestions:{before:1}}]
 
-relations = {}
 
-# hah!
-# for each document, are there both timexs and events in this document? 
-# if so, get the sentences, and check one by one if there are any timexs in the sentence
-# when there are, look at the events in the document and see if there are any in this sentence
-# if so, add an empty pair to relations; we have a same-sentence event-timex relation.
-
-for document in testWords:
-    relations[document] = {}
-    if document in testTimexExtents.keys() and document in testEventExtents.keys():
-        for sentence in document:
-            for timex in testTimexExtents[document]:
-                if testTimexExtents[document][timex]['sentence'] == sentence:
-                        for event in testEventExtents[document]:
-                            if testEventExtents[document][event]['sentence'] == sentence:
-                                relations[document][event + '-' + timex] = {}
+# read relations in from test links file
 
 
-outfile = open('tlinks-timex-event.tab',  'w')
 
-for document,  docRelations in relations.items():
-    if docRelations == {}:
-        del relations[document]
-        continue
+outfile = open(linksFile,  'w')
+
+inLinksFile = open(testPath + linksFile)
+current_file = ''
+
+for line in inLinksFile:
+    document, arg1id,  arg2id,  _x = line.strip().split('\t')
     
-    for relationId,  relationData in docRelations.items():
-        eventId,  timexId = relationId.split('-')
-        event = testEventAttribs[document][eventId]
-        timex = testTimexAttribs[document][timexId]
-        sentence = int(testTimexExtents[document][timexId]['sentence'])
-        timexStart = int(timex['startWord'])
-        eventStart = int(event['startWord'])
-        sentenceText = ' '.join(testWords[document][sentence].values())
-        print '%s: %s-%s in sentence %s; timex @ %s "%s", event @ %s "%s"' % (document,  eventId,  timexId,  sentence,  timexStart,  testWords[document][sentence][timexStart],  eventStart,  testWords[document][sentence][eventStart])
+    if document != current_file:
+        current_file = document
+
         
-        signalHint = {}
-        sentenceSignals = [] # list of word positions where signals are found
-        for signal in signals:
-            for position,  word in testWords[document][sentence].items():
-                if word.lower() == signal:
-                    sentenceSignals.append(position)
+    if arg1id[0] == 'e':
+        arg1 = testEventAttribs[document][arg1id]
+        arg1sentence = int(testEventExtents[document][arg1id]['sentence'])
+    elif arg1id[0] == 't':
+        arg1 = testTimexAttribs[document][arg1id]
+        arg1sentence = int(testTimexExtents[document][arg1id]['sentence'])
+    else:
+        die
+
+    if arg2id[0] == 'e':
+        arg2 = testEventAttribs[document][arg2id]
+        arg2sentence = int(testEventExtents[document][arg2id]['sentence'])
+    elif arg2id[0] == 't':
+        arg2 = testTimexAttribs[document][arg2id]
+        arg2sentence = int(testTimexExtents[document][arg2id]['sentence'])
+    else:
+        die
+    
+    arg1Start = int(arg1['startWord'])
+    arg2Start = int(arg2['startWord'])
+    
+    arg1sentenceText = ' '.join(testWords[document][arg1sentence].values())
+    arg2sentenceText = ' '.join(testWords[document][arg1sentence].values())
+    
+    printArgs = (document,  arg1id,  arg2id,  arg1sentence,  arg2sentence,  arg1['type'],  arg1Start,  testWords[document][arg1sentence][arg1Start]
+                 ,  arg2['type'], arg2Start, testWords[document][arg2sentence][arg2Start])
+    print '%s: %s-%s in sentences %s,%s; arg1 (%s) @ %s "%s", arg2 (%s) @ %s "%s"' % printArgs
+    
+    
+    # represent this pair as a feature list
+    features = {}
+    features['arg1by5'] = (int(arg1['startWord']) + 4) / 5
+    features['arg1intervalType'] = arg1['type']
+    for k, v in arg1['a'].items():
+        features['arg1'+k] = v
+    
+    features['arg2by5'] = (int(arg2['startWord']) + 4) / 5
+    features['arg2intervalType'] = arg2['type']
+    for k, v in arg2['a'].items():
+        features['arg2'+k] = v
+    
+    features['arg1word'] = testWords[document][int(arg1['sentence'])][int(arg1['startWord'])]
+    features['arg2word'] = testWords[document][int(arg2['sentence'])][int(arg2['startWord'])]
+    # include associated signal - so we need to do signal scanning + assoc for this sentence
+    
+    if relation['to'][0] == 'e' and relation['from'][0] == 'e':
+        if arg1['a']['TENSE'] == arg2['a']['TENSE']:
+            features['sameTense'] == True
+        else:
+            features['sameTense'] == False
         
-        if sentenceSignals:
-            print sentenceText
-            for signalPosition in sentenceSignals:
-                print testWords[document][sentence][signalPosition],  '@',  signalPosition
+        if arg1['a']['ASPECT'] == arg2['a']['ASPECT']:
+            features['sameAspect'] == True
+        else:
+            features['sameAspect'] == False
+    
+    
+    if arg2sentence < arg1sentence:
+        features['e1e2'] = False
+    elif arg1sentence == arg2sentence and arg2['startWord'] < arg1['startWord']:
+        features['e1e2'] = False
+    else:
+        features['e1e2'] = True
+    
+    
+    signalHint1 = 'none'
+    # this will hold two values; [distance_from_arg, absolute_offset]
+    nearestSignal1 = [9999, -1]
+    signalHint2 = 'none'
+    nearestSignal2 = [9999,  -1]
+    
+    arg1sentenceText = ' '.join(testWords[document][arg1sentence].values())
+    arg2sentenceText = ' '.join(testWords[document][arg1sentence].values())
+    
+    for signal,  _x in signals.items():
+        signalPos1 = arg1sentenceText.lower().find(signal)
+        signalPos2 = arg2sentenceText.lower().find(signal)
         
-        if len(sentenceSignals) > 1:
-            #pick signal closest to event/timex midpoint
-            pass
+        if signalPos1 != -1:
+            sigDist = abs(signalPos1 - int(arg1['startWord']))
+            if sigDist < nearestSignal1[0]:
+                nearestSignal = [sigDist,  signalPos1]
         
-        
-        # represent this pair as a feature list
-        features = {}
-        features['arg1by5'] = (int(event['startWord']) + 4) / 5
-        features['arg1intervalType'] = event['type']
-        for k, v in event['a'].items():
-            features['arg1'+k] = v
-        
-        features['arg2by5'] = (int(timex['startWord']) + 4) / 5
-        features['arg2intervalType'] = timex['type']
-        for k, v in timex['a'].items():
-            features['arg2'+k] = v
-        
-        
-        classification = classifier.classify(features)
-        
-        outfile.write('\t'.join([document, eventId,  timexId,  classification])+'\n')
+        if signalPos2 != -1:
+            sigDist = abs(signalPos2 - int(arg2['startWord']))
+            if sigDist < nearestSignal2[0]:
+                nearestSignal = [sigDist,  signalPos2]
+    
+    if nearestSignal1[1] != -1:
+        signalHint1 = signals[testWords[document][arg1sentence][nearestSignal1[1]]]
+        features['arg1signal'] = nearestSignal1[1] - arg1['startWord']
+    
+    if nearestSignal2[1] != -1:
+        signalHint2 = signals[testWords[document][arg2sentence][nearestSignal2[1]]]
+        features['arg2signal'] = arg2['startWord'] - nearestSignal2[1]
+    
+    features['signalHint1'] = signalHint1
+    features['signalHint2'] = signalHint2
+    
+    
+    
+    classification = classifier.classify(features)
+    
+    outfile.write('\t'.join([document, arg1id,  arg2id,  classification])+'\n')
 
 
 outfile.close()
+inLinksFile.close()
 
 classifier.show_most_informative_features(5)
