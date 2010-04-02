@@ -94,13 +94,24 @@ words = tempEval2.readSegmentation(segmentationFile)
 ngrams = []
 ngrams.insert(0,  [])
 
+
+def buildSentenceList(sentenceDict):
+    # sort by key, then return items in order.
+    items = sentenceDict.items()
+    items.sort()
+    sentenceList = []
+    for position,  word in items:
+        sentenceList.insert(position, word)
+    return sentenceList
+
 for n in range(1, 6):
     ngrams.insert(n,  {})
     
     for docName in words.keys():
         for sentenceIndex,  wordList in enumerate(words[docName]):
-            for wordIndex,  word in enumerate(words[docName][sentenceIndex][0:-(n - 1)]):
-                ngrams[n][':'.join([docName,  str(sentenceIndex),  str(wordIndex)])] = words[docName][sentenceIndex][wordIndex:wordIndex + n]
+            sentenceList = buildSentenceList(words[docName][sentenceIndex])
+            for wordIndex,  word in enumerate(sentenceList[0:-(n - 1)]):
+                ngrams[n][':'.join([docName,  str(sentenceIndex),  str(wordIndex)])] = sentenceList[wordIndex:wordIndex + n]
 
 timexes = []
 
@@ -147,13 +158,13 @@ for n in range(1, 6):
                         break
                         
                     elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
-                        new_start = min(c['start'],  l['start'])
-                        new_end = max(c['end'],  l['end'])
-                        new_string = words[c['doc']][c['sentence']][new_start:new_end]
-                        new_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':new_start,  'end':new_end,  'tid':tid}
+                        expanded_start = min(c['start'],  l['start'])
+                        expanded_end = max(c['end'],  l['end'])
+                        expanded_string = buildSentenceList(words[c['doc']][c['sentence']])[expanded_start:expanded_end]
+                        expanded_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':expanded_start,  'end':expanded_end,  'tid':tid}
                         tid += 1
-#                        print 'Merged with', l['start'], '-', l['end'], 'to',  new_entry
-                        timexes[k] = new_entry
+#                        print 'Merged with', l['start'], '-', l['end'], 'to',  expanded_entry
+                        timexes[k] = expanded_entry
                         added = True
                         break
                 
@@ -168,7 +179,7 @@ for n in range(1, 6):
 print "Results:"
 for t in timexes:
 #    print '(%s-%s) "%s"' % (doc_timex['start'],  doc_timex['end'],  doc_timex['text'])
-    timexString = ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    timexString = ' '.join(buildSentenceList(words[t['doc']][t['sentence']])[t['start']:t['end']+1])
     print t['doc'], t['sentence'], t['start'], t['end'],   timexString
 
 
@@ -193,10 +204,11 @@ durationRx = re.compile(r'\b(for|during)\b',  re.I)
 numbersRx = re.compile(r'^[0-9]+ ')
 
 for t in timexes:
-    timexString = ' '.join(words[t['doc']][t['sentence']][t['start']:t['end']+1])
+    sentenceList = buildSentenceList(words[t['doc']][t['sentence']])
+    timexString = ' '.join(sentenceList[t['start']:t['end']+1])
     
     timexType = ''
-    previous3Words = ' '.join(words[t['doc']][t['sentence']][t['start']-3:t['start']-1])
+    previous3Words = ' '.join(sentenceList[t['start']-3:t['start']-1])
 
     # e.g. "for 6 months" - duration
     # a year ago - date
@@ -238,6 +250,9 @@ for t in timexes:
         distance = -1
     else:
         distance = 'X'
+    
+    if timexString.lower().find('few ') != -1:
+        distance = -1
     
     if distance and distance != 'X' and int(distance) > 0 and (timexString.lower().find('earlier') > -1 or timexString.lower().find('ago') > -1):
         distance = str(-int(distance))
