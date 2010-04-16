@@ -1,0 +1,165 @@
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2010.1.15)  16 APR 2010 18:33
+entering extended mode
+ %&-line parsing enabled.
+**usfd2
+(./usfd2.tex
+LaTeX2e <2005/12/01>
+Babel <v3.8h> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+(/usr/share/texmf-texlive/tex/latex/base/article.cls
+Document Class: article 2005/09/16 v1.4f Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size11.clo
+File: size11.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (./acl2010.sty
+Conference Style for ACL 2005 -- released Octobe 11, 2004
+\titlebox=\skip43
+) (/usr/share/texmf-texlive/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
+\Urlmuskip=\muskip10
+Package: url 2005/06/27  ver 3.2  Verb mode for urls, etc.
+)
+(/usr/share/texmf-texlive/tex/latex/base/latexsym.sty
+Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 47.
+) (./usfd2.aux)
+\openout1 = `usfd2.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 27.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 28.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 28.
+
+(/usr/share/texmf-texlive/tex/latex/base/ulasy.fd
+File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 28.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 28.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Underfull \hbox (badness 2744) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 sys-tem used in the TempEval-2 task,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 USFD2, which is a suc-ces-sor to
+ []
+
+
+Underfull \hbox (badness 3323) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 USFD (Hep-ple et al., 2007). This
+ []
+
+
+Underfull \hbox (badness 5893) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 task fo-cuses on iden-ti-fy-ing tem-po-ral
+ []
+
+
+Underfull \hbox (badness 2951) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 tem-po-ral re-la-tion as-sign-ment sub-tasks.
+ []
+
+
+Underfull \hbox (badness 1400) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 A rule-based sys-tem dis-crim-i-nates and
+ []
+
+
+Underfull \hbox (badness 1975) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 tem-po-ral sig-nal words in nearby text.
+ []
+
+
+Underfull \hbox (badness 1454) in paragraph at lines 30--31
+\OT1/ptm/m/n/10.95 USFD2 iden-ti-fied tem-po-ral ex-pres-sions
+ []
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 34.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 34.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 34.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 43.
+[1
+
+
+
+]
+Underfull \hbox (badness 1168) in paragraph at lines 51--52
+\OT1/ptm/m/n/10.95 for the timex. As we only an-no-tate \OT1/pcr/m/n/10.95 DATE
+\OT1/ptm/m/n/10.95 s
+ []
+
+
+Underfull \vbox (badness 6047) has occurred while \output is active []
+
+
+Underfull \hbox (badness 1881) in paragraph at lines 73--74
+[]\OT1/ptm/m/n/10.95 good per-for-mance with rule-based el-e-ment,
+ []
+
+[2] (./usfd2.bbl
+Underfull \hbox (badness 2065) in paragraph at lines 36--42
+[]\OT1/ptm/m/n/10 ISO.  2008.  24617-1: 2008.  \OT1/ptm/m/it/10 Lan-guage re-
+ []
+
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+) [3
+
+] (./usfd2.aux) ) 
+Here is how much of TeX's memory you used:
+ 474 strings out of 95087
+ 5812 string characters out of 1183278
+ 53075 words of memory out of 1500000
+ 3687 multiletter control sequences out of 10000+50000
+ 15474 words of font info for 49 fonts, out of 1200000 for 2000
+ 28 hyphenation exceptions out of 8191
+ 24i,9n,19p,1493b,256s stack positions out of 5000i,500n,6000p,200000b,5000s
+
+Output written on usfd2.dvi (3 pages, 14992 bytes).

@@ -1,0 +1,68 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Ahn \bgroup et al.\egroup }2005]{ahn2005towards}
+D.~Ahn, S.F. Adafre, and MD~Rijke.
+\newblock 2005.
+\newblock {Towards task-based temporal extraction and recognition}.
+\newblock In {\em Dagstuhl Seminar Proceedings}, volume 5151. Citeseer.
+
+\bibitem[\protect\citename{Baldwin}2002]{baldwin2002learning}
+J.A. Baldwin.
+\newblock 2002.
+\newblock {\em {Learning temporal annotation of French news}}.
+\newblock {Ph.D.} thesis, Georgetown University.
+
+\bibitem[\protect\citename{Ferro \bgroup et al.\egroup }2005]{ferro2005tides}
+L.~Ferro, L.~Gerber, I.~Mani, B.~Sundheim, and G.~Wilson.
+\newblock 2005.
+\newblock {Tides 2005 standard for the annotation of temporal expressions}.
+
+\bibitem[\protect\citename{Han \bgroup et al.\egroup }2006]{han2006language}
+B.~Han, D.~Gates, and L.~Levin.
+\newblock 2006.
+\newblock {From language to time: A temporal expression anchorer}.
+\newblock In {\em Temporal Representation and Reasoning, 2006. TIME 2006.
+  Thirteenth International Symposium on}, pages 196--203.
+
+\bibitem[\protect\citename{Hepple \bgroup et al.\egroup }2007]{hepple2007usfd}
+M.~Hepple, A.~Setzer, and R.~Gaizauskas.
+\newblock 2007.
+\newblock {USFD: preliminary exploration of features and classifiers for the
+  TempEval-2007 tasks}.
+\newblock In {\em Proceedings of the Fourth International Workshop on Semantic
+  Evaluations (SemEval-2007)}, pages 438--441.
+
+\bibitem[\protect\citename{ISO}2008]{ISO08}
+ISO.
+\newblock 2008.
+\newblock {24617-1: 2008}.
+\newblock {\em Language resources management--Semantic annotation framework
+  (SemAF)--Part1: Time and events}.
+\newblock ISO/TC 37/SC 4/WG 2.
+
+\bibitem[\protect\citename{Mani and Wilson}2000]{mani2000robust}
+I.~Mani and G.~Wilson.
+\newblock 2000.
+\newblock {Robust temporal processing of news}.
+\newblock In {\em Proceedings of the 38th Annual Meeting on Association for
+  Computational Linguistics}, pages 69--76. Association for Computational
+  Linguistics.
+
+\bibitem[\protect\citename{Mazur and Dale}2008]{mazur2008s}
+P.~Mazur and R.~Dale.
+\newblock 2008.
+\newblock {What’s the date? High accuracy interpretation of weekday}.
+\newblock In {\em 22nd International Conference on Computational Linguistics
+  (Coling 2008), Manchester, UK}, pages 553--560.
+
+\bibitem[\protect\citename{Pustejovsky and
+  Verhagen}2009]{pustejovsky2009semeval}
+J.~Pustejovsky and M.~Verhagen.
+\newblock 2009.
+\newblock {SemEval-2010 task 13: evaluating events, time expressions, and
+  temporal relations (TempEval-2)}.
+\newblock In {\em Proceedings of the Workshop on Semantic Evaluations: Recent
+  Achievements and Future Directions}, pages 112--116. Association for
+  Computational Linguistics.
+
+\end{thebibliography}
