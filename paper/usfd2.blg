@@ -2,44 +2,46 @@ This is BibTeX, Version 0.99c (Web2C 7.5.6)
 The top-level auxiliary file: usfd2.aux
 The style file: acl.bst
 Database file #1: usfd2.bib
-You've used 9 entries,
+Warning--empty booktitle in derczynski2010signals
+You've used 14 entries,
             2490 wiz_defined-function locations,
-            603 strings with 6112 characters,
-and the built_in function-call counts, 4015 in all, are:
-= -- 433
-> -- 135
-< -- 6
-+ -- 44
-- -- 44
-* -- 259
-:= -- 608
-add.period$ -- 39
-call.type$ -- 9
-change.case$ -- 57
-chr.to.int$ -- 9
-cite$ -- 9
-duplicate$ -- 189
-empty$ -- 320
-format.name$ -- 56
-if$ -- 884
+            629 strings with 7365 characters,
+and the built_in function-call counts, 7021 in all, are:
+= -- 746
+> -- 286
+< -- 12
++ -- 98
+- -- 98
+* -- 480
+:= -- 1053
+add.period$ -- 63
+call.type$ -- 14
+change.case$ -- 103
+chr.to.int$ -- 14
+cite$ -- 15
+duplicate$ -- 321
+empty$ -- 533
+format.name$ -- 116
+if$ -- 1551
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 7
-newline$ -- 57
-num.names$ -- 27
-pop$ -- 79
+missing$ -- 12
+newline$ -- 87
+num.names$ -- 42
+pop$ -- 145
 preamble$ -- 1
-purify$ -- 67
+purify$ -- 118
 quote$ -- 0
-skip$ -- 159
+skip$ -- 262
 stack$ -- 0
-substring$ -- 197
-swap$ -- 68
-text.length$ -- 6
+substring$ -- 328
+swap$ -- 122
+text.length$ -- 12
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 72
-warning$ -- 0
-while$ -- 33
-width$ -- 11
-write$ -- 129
+type$ -- 112
+warning$ -- 1
+while$ -- 54
+width$ -- 16
+write$ -- 205
+(There was 1 warning)
