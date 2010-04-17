@@ -12,6 +12,23 @@ J.A. Baldwin.
 \newblock {\em {Learning temporal annotation of French news}}.
 \newblock {Ph.D.} thesis, Georgetown University.
 
+\bibitem[\protect\citename{Cheng \bgroup et al.\egroup }2007]{cheng2007naist}
+Y.~Cheng, M.~Asahara, and Y.~Matsumoto.
+\newblock 2007.
+\newblock {Naist. japan: Temporal relation identification using dependency
+  parsed tree}.
+\newblock In {\em Proceedings of the 4th International Workshop on Semantic
+  Evaluations}, pages 245--248. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Derczynski and
+  Gaizauskas}2010]{derczynski2010signals}
+L.~Derczynski and R.~Gaizauskas.
+\newblock 2010.
+\newblock Using signals to improve automatic classification of temporal
+  relations.
+\newblock University of Sheffield.
+\newblock Submitted to ESSLLI 2010.
+
 \bibitem[\protect\citename{Ferro \bgroup et al.\egroup }2005]{ferro2005tides}
 L.~Ferro, L.~Gerber, I.~Mani, B.~Sundheim, and G.~Wilson.
 \newblock 2005.
@@ -32,14 +49,6 @@ M.~Hepple, A.~Setzer, and R.~Gaizauskas.
 \newblock In {\em Proceedings of the Fourth International Workshop on Semantic
   Evaluations (SemEval-2007)}, pages 438--441.
 
-\bibitem[\protect\citename{ISO}2008]{ISO08}
-ISO.
-\newblock 2008.
-\newblock {24617-1: 2008}.
-\newblock {\em Language resources management--Semantic annotation framework
-  (SemAF)--Part1: Time and events}.
-\newblock ISO/TC 37/SC 4/WG 2.
-
 \bibitem[\protect\citename{Mani and Wilson}2000]{mani2000robust}
 I.~Mani and G.~Wilson.
 \newblock 2000.
@@ -48,12 +57,29 @@ I.~Mani and G.~Wilson.
   Computational Linguistics}, pages 69--76. Association for Computational
   Linguistics.
 
+\bibitem[\protect\citename{Mani \bgroup et al.\egroup }2006]{mani2006machine}
+I.~Mani, M.~Verhagen, B.~Wellner, C.M. Lee, and J.~Pustejovsky.
+\newblock 2006.
+\newblock {Machine learning of temporal relations}.
+\newblock In {\em Proceedings of the 21st International Conference on
+  Computational Linguistics and the 44th annual meeting of the Association for
+  Computational Linguistics}, page 760. Association for Computational
+  Linguistics.
+
 \bibitem[\protect\citename{Mazur and Dale}2008]{mazur2008s}
 P.~Mazur and R.~Dale.
 \newblock 2008.
 \newblock {What’s the date? High accuracy interpretation of weekday}.
 \newblock In {\em 22nd International Conference on Computational Linguistics
   (Coling 2008), Manchester, UK}, pages 553--560.
+
+\bibitem[\protect\citename{Min \bgroup et al.\egroup }2007]{min2007lcc}
+C.~Min, M.~Srikanth, and A.~Fowler.
+\newblock 2007.
+\newblock {LCC-TE: a hybrid approach to temporal relation identification in
+  news text}.
+\newblock In {\em Proceedings of the 4th International Workshop on Semantic
+  Evaluations}, pages 219--222. Association for Computational Linguistics.
 
 \bibitem[\protect\citename{Pustejovsky and
   Verhagen}2009]{pustejovsky2009semeval}
@@ -64,5 +90,22 @@ J.~Pustejovsky and M.~Verhagen.
 \newblock In {\em Proceedings of the Workshop on Semantic Evaluations: Recent
   Achievements and Future Directions}, pages 112--116. Association for
   Computational Linguistics.
+
+\bibitem[\protect\citename{Pustejovsky \bgroup et al.\egroup
+  }2003]{pustejovsky2003timebank}
+J.~Pustejovsky, P.~Hanks, R.~Sauri, A.~See, R.~Gaizauskas, A.~Setzer, D.~Radev,
+  B.~Sundheim, D.~Day, L.~Ferro, et~al.
+\newblock 2003.
+\newblock {The timebank corpus}.
+\newblock In {\em Corpus Linguistics}, volume 2003, page~40.
+
+\bibitem[\protect\citename{Yoshikawa \bgroup et al.\egroup }2009]{1687936}
+Katsumasa Yoshikawa, Sebastian Riedel, Masayuki Asahara, and Yuji Matsumoto.
+\newblock 2009.
+\newblock Jointly identifying temporal relations with markov logic.
+\newblock In {\em ACL-IJCNLP '09: Proceedings of the Joint Conference of the
+  47th Annual Meeting of the ACL and the 4th International Joint Conference on
+  Natural Language Processing of the AFNLP: Volume 1}, pages 405--413,
+  Morristown, NJ, USA. Association for Computational Linguistics.
 
 \end{thebibliography}
