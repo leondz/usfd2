@@ -5,16 +5,16 @@ Database file #1: usfd2.bib
 Warning--empty booktitle in derczynski2010signals
 You've used 14 entries,
             2490 wiz_defined-function locations,
-            629 strings with 7365 characters,
-and the built_in function-call counts, 7021 in all, are:
-= -- 746
+            628 strings with 7058 characters,
+and the built_in function-call counts, 7007 in all, are:
+= -- 741
 > -- 286
 < -- 12
 + -- 98
 - -- 98
-* -- 480
-:= -- 1053
-add.period$ -- 63
+* -- 479
+:= -- 1050
+add.period$ -- 62
 call.type$ -- 14
 change.case$ -- 103
 chr.to.int$ -- 14
@@ -22,7 +22,7 @@ cite$ -- 15
 duplicate$ -- 321
 empty$ -- 533
 format.name$ -- 116
-if$ -- 1551
+if$ -- 1546
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 12
@@ -32,7 +32,7 @@ pop$ -- 145
 preamble$ -- 1
 purify$ -- 118
 quote$ -- 0
-skip$ -- 262
+skip$ -- 264
 stack$ -- 0
 substring$ -- 328
 swap$ -- 122
@@ -43,5 +43,5 @@ type$ -- 112
 warning$ -- 1
 while$ -- 54
 width$ -- 16
-write$ -- 205
+write$ -- 204
 (There was 1 warning)
