@@ -4,7 +4,7 @@
 D.~Ahn, S.F. Adafre, and MD~Rijke.
 \newblock 2005.
 \newblock {Towards task-based temporal extraction and recognition}.
-\newblock In {\em Dagstuhl Seminar Proceedings}, volume 5151. Citeseer.
+\newblock In {\em Dagstuhl Seminar Proceedings}, volume 5151.
 
 \bibitem[\protect\citename{Baldwin}2002]{baldwin2002learning}
 J.A. Baldwin.
@@ -18,7 +18,7 @@ Y.~Cheng, M.~Asahara, and Y.~Matsumoto.
 \newblock {Naist. japan: Temporal relation identification using dependency
   parsed tree}.
 \newblock In {\em Proceedings of the 4th International Workshop on Semantic
-  Evaluations}, pages 245--248. Association for Computational Linguistics.
+  Evaluations}, pages 245--248. ACL.
 
 \bibitem[\protect\citename{Derczynski and
   Gaizauskas}2010]{derczynski2010signals}
@@ -46,25 +46,22 @@ M.~Hepple, A.~Setzer, and R.~Gaizauskas.
 \newblock 2007.
 \newblock {USFD: preliminary exploration of features and classifiers for the
   TempEval-2007 tasks}.
-\newblock In {\em Proceedings of the Fourth International Workshop on Semantic
-  Evaluations (SemEval-2007)}, pages 438--441.
+\newblock In {\em Proceedings of SemEval-2007}, pages 438--441.
 
 \bibitem[\protect\citename{Mani and Wilson}2000]{mani2000robust}
 I.~Mani and G.~Wilson.
 \newblock 2000.
 \newblock {Robust temporal processing of news}.
-\newblock In {\em Proceedings of the 38th Annual Meeting on Association for
-  Computational Linguistics}, pages 69--76. Association for Computational
-  Linguistics.
+\newblock In {\em Proceedings of the 38th Annual Meeting on ACL}, pages 69--76.
+  ACL.
 
 \bibitem[\protect\citename{Mani \bgroup et al.\egroup }2006]{mani2006machine}
 I.~Mani, M.~Verhagen, B.~Wellner, C.M. Lee, and J.~Pustejovsky.
 \newblock 2006.
 \newblock {Machine learning of temporal relations}.
 \newblock In {\em Proceedings of the 21st International Conference on
-  Computational Linguistics and the 44th annual meeting of the Association for
-  Computational Linguistics}, page 760. Association for Computational
-  Linguistics.
+  Computational Linguistics and the 44th annual meeting of the ACL}, page 760.
+  ACL.
 
 \bibitem[\protect\citename{Mazur and Dale}2008]{mazur2008s}
 P.~Mazur and R.~Dale.
@@ -79,7 +76,7 @@ C.~Min, M.~Srikanth, and A.~Fowler.
 \newblock {LCC-TE: a hybrid approach to temporal relation identification in
   news text}.
 \newblock In {\em Proceedings of the 4th International Workshop on Semantic
-  Evaluations}, pages 219--222. Association for Computational Linguistics.
+  Evaluations}, pages 219--222. ACL.
 
 \bibitem[\protect\citename{Pustejovsky and
   Verhagen}2009]{pustejovsky2009semeval}
@@ -88,8 +85,7 @@ J.~Pustejovsky and M.~Verhagen.
 \newblock {SemEval-2010 task 13: evaluating events, time expressions, and
   temporal relations (TempEval-2)}.
 \newblock In {\em Proceedings of the Workshop on Semantic Evaluations: Recent
-  Achievements and Future Directions}, pages 112--116. Association for
-  Computational Linguistics.
+  Achievements and Future Directions}, pages 112--116. ACL.
 
 \bibitem[\protect\citename{Pustejovsky \bgroup et al.\egroup
   }2003]{pustejovsky2003timebank}
@@ -103,9 +99,7 @@ J.~Pustejovsky, P.~Hanks, R.~Sauri, A.~See, R.~Gaizauskas, A.~Setzer, D.~Radev,
 Katsumasa Yoshikawa, Sebastian Riedel, Masayuki Asahara, and Yuji Matsumoto.
 \newblock 2009.
 \newblock Jointly identifying temporal relations with markov logic.
-\newblock In {\em ACL-IJCNLP '09: Proceedings of the Joint Conference of the
-  47th Annual Meeting of the ACL and the 4th International Joint Conference on
-  Natural Language Processing of the AFNLP: Volume 1}, pages 405--413,
-  Morristown, NJ, USA. Association for Computational Linguistics.
+\newblock In {\em ACL-IJCNLP '09: Proceedings of 47th Annual Meeting of the
+  ACL}, pages 405--413, Morristown, NJ, USA. ACL.
 
 \end{thebibliography}

@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2010.2.2)  17 APR 2010 14:37
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2010.2.2)  18 APR 2010 01:00
 entering extended mode
  %&-line parsing enabled.
 **usfd2
@@ -90,10 +90,7 @@ Underfull \hbox (badness 3386) in paragraph at lines 34--35
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 43.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [1
+[1
 
 
 
@@ -104,22 +101,20 @@ Underfull \hbox (badness 1168) in paragraph at lines 51--52
  []
 
 
-Underfull \hbox (badness 1552) in paragraph at lines 60--61
-\OT1/ptm/m/n/10.95 Our ap-proach for la-belling tem-po-ral re-la-tions
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 67.
+
+Underfull \hbox (badness 1168) in paragraph at lines 100--101
+\OT1/ptm/b/n/10.95 TLINK\OT1/ptm/m/n/10.95 s) is based on NLTK's max-i-mum en-
  []
 
 
-Underfull \hbox (badness 1014) in paragraph at lines 60--61
-\OT1/ptm/m/n/10.95 Gaizauskas (2010), with some slight changes.
- []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Underfull \hbox (badness 1117) in paragraph at lines 62--63
-\OT1/ptm/m/n/10.95 in Cheng et al. (2007) to pick sig-nal words.
- []
-
-[2]
-Underfull \hbox (badness 2469) in paragraph at lines 95--96
+ [2]
+Underfull \hbox (badness 2469) in paragraph at lines 137--138
 []\OT1/ptm/m/n/10.95 Unlike pre-vi-ous ap-proaches us-ing a max-i-
  []
 
@@ -128,29 +123,29 @@ Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-Underfull \hbox (badness 10000) in paragraph at lines 96--101
+Underfull \hbox (badness 10000) in paragraph at lines 92--97
 []\OT1/ptm/m/n/10 J. Puste-jovsky, P. Hanks, R. Sauri, A. See,
  []
 
 
-Underfull \hbox (badness 1205) in paragraph at lines 96--101
+Underfull \hbox (badness 1205) in paragraph at lines 92--97
 \OT1/ptm/m/n/10 R. Gaizauskas, A. Set-zer, D. Radev, B. Sund-
  []
 
 
-Underfull \hbox (badness 1728) in paragraph at lines 96--101
+Underfull \hbox (badness 1728) in paragraph at lines 92--97
 \OT1/ptm/m/n/10 cor-pus.  In \OT1/ptm/m/it/10 Cor-pus Lin-guis-tics\OT1/ptm/m/n
 /10 , vol-ume 2003,
  []
 
 ) [4] (./usfd2.aux) ) 
 Here is how much of TeX's memory you used:
- 482 strings out of 95087
- 5949 string characters out of 1183279
- 54075 words of memory out of 1500000
- 3694 multiletter control sequences out of 10000+50000
- 16120 words of font info for 50 fonts, out of 1200000 for 2000
+ 486 strings out of 95087
+ 6004 string characters out of 1183279
+ 56075 words of memory out of 1500000
+ 3698 multiletter control sequences out of 10000+50000
+ 17187 words of font info for 52 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 24i,9n,19p,1637b,264s stack positions out of 5000i,500n,6000p,200000b,5000s
+ 24i,9n,19p,1665b,300s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on usfd2.dvi (4 pages, 23780 bytes).
+Output written on usfd2.dvi (4 pages, 26784 bytes).

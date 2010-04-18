@@ -27,47 +27,88 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-We describe the University of Sheffield system used in the TempEval-2 challenge, USFD2. The challenge requires the automatic identification of temporal entities and relations in text, in an attempt to further research in the field of temporal information extraction and the processing of temporal information in NLP.\\USFD2 identifies and anchors temporal expressions, and also attemps two of the four temporal relation assignment tasks. A rule-based system picks out and anchors temporal expressions, and a maxium entropy classifier assigns temporal link labels, based on features that including descriptions of associated temporal signal words. USFD2 identified temporal expressions well, and correctly classified their type in 90\% of cases. Determining the relation between an event and time expression in the same sentence was performed at 63\% accuracy, the second highest score in this part of TempEval-2.
+We describe the University of Sheffield system used in the TempEval-2 challenge, USFD2. The challenge requires the automatic identification of temporal entities and relations in text. USFD2 identifies and anchors temporal expressions, and also attemps two of the four temporal relation assignment tasks. A rule-based system picks out and anchors temporal expressions, and a maxium entropy classifier assigns temporal link labels, based on features that including descriptions of associated temporal signal words. USFD2 identified temporal expressions successfully, and correctly classified their type in 90\% of cases. Determining the relation between an event and time expression in the same sentence was performed at 63\% accuracy, the second highest score in this part of TempEval-2.
 \end{abstract}
 
 \section{Introduction}
-The TempEval-2~\cite{pustejovsky2009semeval} challenge proposes six tasks. Our system tackles three of these: task A -- identifying time expressions, assigning {\tt TIMEX3} attribute values, and anchoring them; task C -- determining the temporal relation between and event and time in the same sentence; and task E -- determinig the temporal relation between two main events in consecutive sentences. For our participation in the task, we have decided to employ both rule- and ML-classifier-based approaches. Temporal expressions are dealt with by sets of rules and regular expressions, and relation labelling performed by NLTK's\footnote{See http://www.nltk.org/ .} maximum entropy classifier with rule-based processing applied during feature generation. The features (described in full in Section~\ref{description}) included attributes from the TempEval-2 training data annotation, augmented by features that can be directly derived from the annotated texts. There are two main aims of this work; to create a rule-based temporal expression annotator that included knowledge from work published since GUTime~\cite{mani2000robust} and measure its performance, and to measure the performance of a classifier that includes features based on temporal signals.
+The TempEval-2~\cite{pustejovsky2009semeval} challenge proposes six tasks. Our system tackles three of these: task A -- identifying time expressions, assigning {\tt TIMEX3} attribute values, and anchoring them; task C -- determining the temporal relation between and event and time in the same sentence; and task E -- determinig the temporal relation between two main events in consecutive sentences. For our participation in the task, we decided to employ both rule- and ML-classifier-based approaches. Temporal expressions are dealt with by sets of rules and regular expressions, and relation labelling performed by NLTK's\footnote{See http://www.nltk.org/ .} maximum entropy classifier with rule-based processing applied during feature generation. The features (described in full in Section~\ref{description}) included attributes from the TempEval-2 training data annotation, augmented by features that can be directly derived from the annotated texts. There are two main aims of this work; to create a rule-based temporal expression annotator that included knowledge from work published since GUTime~\cite{mani2000robust} and measure its performance, and to measure the performance of a classifier that includes features based on temporal signals.
 
-Our entry to the challenge, USFD2, is a successor to USFD~\cite{hepple2007usfd}. In the rest of this paper, we will describe how USFD2 is constructed (Section~\ref{description}), and then go on to discuss overall its performance and the impact of some internal parameters on specific TempEval tasks. Regarding classifiers, we found that despite using identical feature sets across relation classification tasks, performance varied significantly. We also found that USFD2 performance trends with TempEval-2 did not match those seen when classifiers were trained on other data while performing similar tasks. The paper closes with comments about future work.
+Our entry to the challenge, USFD2, is a successor to USFD~\cite{hepple2007usfd}. In the rest of this paper, we will describe how USFD2 is constructed (Section~\ref{description}), and then go on to discuss its overall performance and the impact of some internal parameters on specific TempEval tasks. Regarding classifiers, we found that despite using identical feature sets across relation classification tasks, performance varied significantly. We also found that USFD2 performance trends with TempEval-2 did not match those seen when classifiers were trained on other data while performing similar tasks. The paper closes with comments about future work.
 
 
 \section{System Description}
 \label{description}
-The TempEval-2 training and test sets are partitioned into data for entity recognition \& description, and data for temporal relation classification. We will first discuss our approach for temporal expression recognition, description and anchoring, and then discuss our approach to two of the relation labelling tasks.
+The TempEval-2 training and test sets are partitioned into data for entity recognition and description, and data for temporal relation classification. We will first discuss our approach for temporal expression recognition, description and anchoring, and then discuss our approach to two of the relation labelling tasks.
 
 \subsection{Identifying, describing and anchoring temporal expressions}
 \label{timex}
-Task A of TempEval-2 requires the identification of a temporal expression (or {\bf timex}) by describing a start and end bound for each expression, and assigning an ID to it. After this, systems should attempt to describe the temporal expression, determining its type and value (described below).
+Task A of TempEval-2 requires the identification of temporal expressions (or {\bf timex}s) by defining a start and end boundary for each expression, and assigning an ID to it. After this, systems should attempt to describe the temporal expression, determining its type and value (described below).
 
 Our timex recogniser works by building a set of n-grams from the data to be annotated ($1 \leq n \leq 5$), and comparing each n-gram against a hand-crafted set of regular expressions. This approach has been shown to achieve high precision, with recall increasing in proportion to ruleset complexity~\cite{han2006language,mani2000robust,ahn2005towards}. The recogniser chooses the largest possible sequence of words that could be a single temporal expression, discarding any sub-parts that independently match any of our set of regular expressions. The result is a set of boundary-pairs that describe temporal expression locations within documents. This part of the system achieved 0.84 precision and 0.79 recall, for a balanced f1-measure of 0.82.
 
-The next part of the task is to assign a type to each temporal expression. These can be one of {\tt TIME}, {\tt DATE}, {\tt DURATION}, or {\tt SET}. USFD2 only distinguishes between {\tt DATE} and {\tt DURATION} timexes. If the words \emph{for} or \emph{during} occur in the three words before the timex, the timex ends with an {\emph s} (such as in \emph{seven years}), or the timex is a bi-gram whose first token is {\emph a} (\emph{a month}), then the timex is deemed to be of type {\tt DURATION}; otherwise it is a {\tt DATE}. These three rules for determining type were created based on observation of output over the test data, and are correct 90\% of the time with the evaluation data.
+The next part of the task is to assign a type to each temporal expression. These can be one of {\tt TIME}, {\tt DATE}, {\tt DURATION}, or {\tt SET}. USFD2 only distinguishes between {\tt DATE} and {\tt DURATION} timexes. If the words \emph{for} or \emph{during} occur in the three words before the timex, the timex ends with an {\emph s} (such as in \emph{seven years}), or the timex is a bi-gram whose first token is {\emph a} (e.g. in \emph{a month}), then the timex is deemed to be of type {\tt DURATION}; otherwise it is a {\tt DATE}. These three rules for determining type were created based on observation of output over the test data, and are correct 90\% of the time with the evaluation data.
 
-The final part of task A is to provide a value for the timex. As we only annotate {\tt DATE}s and {\tt DURATION}s, these will be either a fixed calendrical reference in the format YYYY-MM-DD, or a duration in according to the TIMEX2 standard~\cite{ferro2005tides}. Timex strings of \emph{today} or \emph{now} were assigned the special value {\tt PRESENT\_REF}, which assumes that \emph{today} is being used in a literal and not figurative manner, an assumption which holds around 90\% of the time in newswire text~\cite{ahn2005towards} such as that provided for TempEval-2. In an effort to calculate a temporal distance from the document creation time (DCT), USFD2 will then check to see if numeric words (e.g. \emph{one}, \emph{seven hundred}) are in the timex, as well as words like \emph{last} or \emph{next} which determine temporal offset direction. This distance figure supplies either the second parameter to a {\tt DURATION} value, or helps calculate DCT offset. Strings that describe an imprecise amount, such as \emph{few}, are represented in duration values with an {\tt X}. We next search the timex for temporal unit strings (e.g. \emph{quarter}, \emph{day}). This helps build either a duration length or an offset. If we are anchoring a date, the offset is applied to DCT, and date granularity adjusted according to the coarsest temporal primitive present -- for example, if DCT is 1997-06-12 and our timex is \emph{six months ago}, a value of 1997-01 is assigned, as it is unlikely that the temporal expression refers to the day precisely six months ago, unless followed by the word \emph{today}.
+The final part of task A is to provide a value for the timex. As we only annotate {\tt DATE}s and {\tt DURATION}s, these will be either a fixed calendrical reference in the format YYYY-MM-DD, or a duration in according to the TIMEX2 standard~\cite{ferro2005tides}. Timex strings of \emph{today} or \emph{now} were assigned the special value {\tt PRESENT\_REF}, which assumes that \emph{today} is being used in a literal and not figurative manner, an assumption which holds around 90\% of the time in newswire text~\cite{ahn2005towards} such as that provided for TempEval-2. In an effort to calculate a temporal distance from the document creation time (DCT), USFD2 will then check to see if numeric words (e.g. \emph{one}, \emph{seven hundred}) are in the timex, as well as words like \emph{last} or \emph{next} which determine temporal offset direction. This distance figure supplies either the second parameter to a {\tt DURATION} value, or helps calculate DCT offset. Strings that describe an imprecise amount, such as \emph{few}, are represented in duration values with an {\tt X}, as per the TIMEX2 standard. We next search the timex for temporal unit strings (e.g. \emph{quarter}, \emph{day}). This helps build either a duration length or an offset. If we are anchoring a date, the offset is applied to DCT, and date granularity adjusted according to the coarsest temporal primitive present -- for example, if DCT is 1997-06-12 and our timex is \emph{six months ago}, a value of 1997-01 is assigned, as it is unlikely that the temporal expression refers to the day precisely six months ago, unless followed by the word \emph{today}.
 
-Where weekday names are found, we used Baldwin's 7-day window~\cite{baldwin2002learning} to anchor these to a calendrical timeline. This technique has been found to be accurate over 94\% of the time with newswire text~\cite{mazur2008s}. Where dates are found that do not specify a year or a clear temporal direction marker (e.g., \emph{April 17} vs. \emph{last July}), our algorithm counts the number of days between DCT and the next occurence of that date. If this is over a limit $f$, then the date is assumed to be last year. This is a very general rule and does not take into account the tendency of very-precisely-described dates to be closer to DCT, and far off dates to be loosely specified. An $f$ of 14 days gives the highest performance.
+Where weekday names are found, we used Baldwin's 7-day window~\cite{baldwin2002learning} to anchor these to a calendrical timeline. This technique has been found to be accurate over 94\% of the time with newswire text~\cite{mazur2008s}. Where dates are found that do not specify a year or a clear temporal direction marker (e.g., \emph{April 17} vs. \emph{last July}), our algorithm counts the number of days between DCT and the next occurence of that date. If this is over a limit $f$, then the date is assumed to be last year. This is a very general rule and does not take into account the tendency of very-precisely-described dates to be closer to DCT, and far off dates to be loosely specified. An $f$ of 14 days gives the highest performance based on the TempEval-2 training data.
 
 Anchoring dates / specifying duration lengths was the most complex part of task A and our na\"{\i}ve rule set was correct only 17\% of the time.
 
 \subsection{Labelling temporal relations}
 \label{tlink} 
 
-Our approach for labelling temporal relations (which we will call \textbf{TLINK}s) is based on NLTK's maximum entropy classifier, using the feature sets initially proposed in~\newcite{mani2006machine}. These features are augmented with the features used to describe signals detailed in~\newcite{derczynski2010signals}, with some slight changes. Firstly, as there are no specific TLINK/signal associations in the TempEval-2 data, USFD2 needs to identify signals and associate them with a temporal entity or relation. Secondly, a look-up list is used to provide TLINK label hints based on a signal word.
-
-We used a simplified version of the approach in~\newcite{cheng2007naist} to pick signal words. This involved simply hand-picking a list of signal phrases that occur in TimeBank~\cite{pustejovsky2003timebank} with a frequency of 2 or more, and associating a signal with a temporal entity if it is in the same sentence and clause. The nearest signal is chosen in the case of conflict. Thus we achieved signal identification and association.
-
 \begin{table}
 \begin{center}
-\caption{Signals and the TempEval-2 temporal relation they suggest}
+\caption{Features used by USFD2 to train a temporal relation classifier.}
+\label{tab:features}
+\small
+\begin{tabular}{| l | r |}
+\hline
+\textbf{Feature} & \textbf{Type} \\
+\hline
+\emph{For events} & \\
+Tense & String \\
+Aspect & String \\
+Polarity & pos or neg \\
+Modality & String \\
+\hline
+\emph{For timexs} & \\
+Type & Timex type \\
+Value & String \\
+\hline
+\emph{Describing signals} & \\
+Signal text & String \\
+Signal hint & Relation type \\
+Arg 1 before signal? & Boolean \\
+Signal before Arg 2? & Boolean \\
+\hline
+\emph{For every relation} & \\
+Arguments are same tense & Boolean \\
+Arguments are same aspect & Boolean \\
+Arg 1 before Arg 2? & Boolean \\
+\hline
+\emph{For every interval} & \\
+Token number in sentence / 5 & Integer \\
+Text annotated & String \\
+Interval type & event or timex \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\normalsize
+
+Our approach for labelling temporal relations (or \textbf{TLINK}s) is based on NLTK's maximum entropy classifier, using the feature sets initially proposed in~\newcite{mani2006machine}. Features that describe temporal signals have been shown to give a 30\% performance boost in TLINKs that employ a signal~\cite{derczynski2010signals}. Thus, the features in~\newcite{mani2006machine} are augmented with those used to describe signals detailed in~\newcite{derczynski2010signals}, with some slight changes. Firstly, as there are no specific TLINK/signal associations in the TempEval-2 data, USFD2 needs to perform signal identification and then associate signals with a temporal relation or entity. Secondly, a look-up list is used to provide TLINK label hints based on a signal word. A list of features employed by USFD2 is in Table~\ref{tab:features}.
+
+We used a simplified version of the approach in~\newcite{cheng2007naist} to pick signal words. This involved hand-picking a list of signal phrases that occur in TimeBank~\cite{pustejovsky2003timebank} with a frequency of 2 or more, and associating a signal from this list with a temporal entity if it is in the same sentence and clause. The nearest signal is chosen in the case of conflict.
+
+\small
+\begin{table}
+\begin{center}
+\caption{A sample of signals and the TempEval-2 temporal relation they suggest.}
 \label{tab:signalHints}
 \begin{tabular}{| l | c |}
 \hline
- Signal phrase & Suggested relation \\
+ \textbf{Signal phrase} & \textbf{Suggested relation} \\
 \hline
 previous & \textsc{after} \\
 ahead of & \textsc{before} \\
@@ -83,25 +124,26 @@ throughout & \textsc{overlap} \\
 \end{tabular}
 \end{center}
 \end{table}
+\normalsize
 
-As this list of signal phrases only contained 42 entries, we also decided to define a ``most-likely" temporal relation for each signal. This was done by imagining a short sentence of the form \emph{event1 -- signal -- event2}, and describing the relation between event 1 and event 2. An excerpt from these entries is shown in Table~\ref{tab:signalHints}. The hint from this table was included with a feature. Determining whether or not to invert the relation type based on word order was left to the classifier, which is already provided with word order features.
+As this list of signal phrases only contained 42 entries, we also decided to define a ``most-likely" temporal relation for each signal. This was done by imagining a short sentence of the form \emph{event1 -- signal -- event2}, and describing the type of relation between event 1 and event 2. An excerpt from these entries is shown in Table~\ref{tab:signalHints}. The hint from this table was included as a feature. Determining whether or not to invert the suggested relation type based on word order was left to the classifier, which is already provided with word order features. It would be possible to build these suggestions from data such as TimeBank, but a number of problems stand in the way; the TimeML and TempEval-2 relation types are not identical, word order often affects the actual relationship type suggested by a signal (e.g. compare \emph{He ran home before he showered} and \emph{Before he ran home, he showered}), and noise in mined data is a problem with the low corpus occurence frequency of most signals.
 
 This approach was used for both the intra-sentence timex/event TLINK labelling task and also the task of labelling relations between main events in adjacent sentences.
 
 \section{Discussion}
 \label{discussion}
-USFD2's rule-based element for timex identification and description performs well, even achieving above-average recall despite a much smaller rule set than comparable and more complex systems. A ``hit-or-miss" metric for evaluating the annotation of timex values gives partial matches a zero score, though this part of the system is clearly the weakest.
+USFD2's rule-based element for timex identification and description performs well, even achieving above-average recall despite a much smaller rule set than comparable and more complex systems. However, the temporal anchroing component performs less strongly. The ``all-or-nothing" metric employed for evaluating the annotation of timex values gives non-strict matches a zero score (e.g. if the expected answer is 1990-05-14, no reward is given for 1990-05) even if values are close, which many were.
 
-Unlike previous approaches using a maximum entropy classifier and comparable feature set~\cite{mani2006machine,derczynski2010signals}, the classification of event-event relations was less accurate than the classification of event-timex relations. Event-event relation classification accuracy was good (63\%), despite the lack of explicit signal/tlink associations and a sophisticated signal recognition and association mechanism. This is signficantly higher than accuracy in task E -- 45\% -- though the latter is a harder task, as most TempEval-2 systems performed significantly worse at this task than event/timex relation classification.
+Unlike previous approaches using a maximum entropy classifier and comparable feature set~\cite{mani2006machine,derczynski2010signals}, the classification of event-event relations was less accurate than the classification of event-timex relations. Event-event relation classification accuracy was good (63\%), despite the lack of explicit signal/TLINK associations and a sophisticated signal recognition and association mechanism. This is signficantly higher than USFD2's accuracy in task E -- 45\% -- though the latter is a harder task, as most TempEval-2 systems performed significantly worse at this task than event/timex relation classification.
 
-Signal information was not relied on by many TempEval 2007 systems (~\newcite{min2007lcc} discusses signals to some extent but the system described there only includes signal text as a single featue), and certainly no processing of this data was performed for that challenge. USFD2 begins to leverage this information, and gives very competitive performance at event/timex classification despite its simple construction.
+Signal information was not relied on by many TempEval 2007 systems (\newcite{min2007lcc} discusses signals to some extent but the system described there only includes a single feature -- the signal text), and certainly no processing of this data was performed for that challenge. USFD2 begins to leverage this information, and gives very competitive performance at event/timex classification. Figures on the impact that signal-based features had on our system's performance will be available shortly.
 
-The performance of classifier based approaches to temporal link labelling seems to be levelling off -- the accuracy of work such as~\newcite{mani2006machine} has not been greatly exceeded. The 60\%-70\% relation labelling accuracy is still the peak of the current generation of systems performing this task. Recent improvements, while employing novel approaches to the task that rely on interactions between individual links and non-trivial linguistic information, only yield marginal improvements (e.g. ~\newcite{1687936}). It seems that to break through this performance ``wall", we need to continue to innovate with and discuss temporal relation labelling, drawing on information from many sources to build complex systems.
+The performance of classifier based approaches to temporal link labelling seems to be levelling off -- the 60\%-70\% relation labelling accuracy of work such as~\newcite{mani2006machine} has not been greatly exceeded. This performance level is still the peak of the current generation of systems. Recent improvements, while employing novel approaches to the task that rely on interactions between individual links or non-trivial linguistic information, still yield marginal improvements (e.g. ~\newcite{1687936}). It seems that to break through this performance ``wall", we need to continue to innovate with and discuss temporal relation labelling, drawing on information and knowledge from many sources to build practical high-performance systems.
 
 \section{Conclusion}
 \label{conclusion}
 
-In this paper, we have presented USFD2, a novel system that annotates temporal expressions and temporal links in text. The system is clearly laid out and simple, relying on new hand-crafted rules, existing rule sets, machine learning and temporal signal information to make its decisions. Although some of the TempEval-2 tasks are difficult, USFD2 manages to create good and useful annotations of temporal information.
+In this paper, we have presented USFD2, a novel system that annotates temporal expressions and temporal links in text. The relies on new hand-crafted rules, existing rule sets, machine learning and temporal signal information to make its decisions. Although some of the TempEval-2 tasks are difficult, USFD2 manages to create good and useful annotations of temporal information. USFD2 is available via Google Code\footnote{See http://code.google.com/p/usfd2/ .}.
 
 \section*{Acknowledgments}
 Both authors are grateful for the efforts of the TempEval-2 team and appreciate their hard work. The first author would like to acknowledge the UK Engineering and Physical Science Research Council for support in the form of a doctoral studentship.
