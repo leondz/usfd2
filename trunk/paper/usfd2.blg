@@ -2,46 +2,44 @@ This is BibTeX, Version 0.99c (Web2C 7.5.6)
 The top-level auxiliary file: usfd2.aux
 The style file: acl.bst
 Database file #1: usfd2.bib
-Warning--empty booktitle in derczynski2010signals
 You've used 14 entries,
             2490 wiz_defined-function locations,
-            628 strings with 7058 characters,
-and the built_in function-call counts, 7007 in all, are:
-= -- 741
-> -- 286
+            628 strings with 6844 characters,
+and the built_in function-call counts, 6933 in all, are:
+= -- 725
+> -- 281
 < -- 12
-+ -- 98
-- -- 98
-* -- 479
-:= -- 1050
-add.period$ -- 62
++ -- 96
+- -- 96
+* -- 472
+:= -- 1041
+add.period$ -- 60
 call.type$ -- 14
 change.case$ -- 103
 chr.to.int$ -- 14
-cite$ -- 15
-duplicate$ -- 321
-empty$ -- 533
-format.name$ -- 116
-if$ -- 1546
+cite$ -- 14
+duplicate$ -- 323
+empty$ -- 530
+format.name$ -- 114
+if$ -- 1523
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 12
-newline$ -- 87
+newline$ -- 88
 num.names$ -- 42
-pop$ -- 145
+pop$ -- 138
 preamble$ -- 1
-purify$ -- 118
+purify$ -- 117
 quote$ -- 0
-skip$ -- 264
+skip$ -- 268
 stack$ -- 0
 substring$ -- 328
-swap$ -- 122
+swap$ -- 123
 text.length$ -- 12
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 112
-warning$ -- 1
+warning$ -- 0
 while$ -- 54
 width$ -- 16
-write$ -- 204
-(There was 1 warning)
+write$ -- 203
