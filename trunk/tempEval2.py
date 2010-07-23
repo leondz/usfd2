@@ -1,3 +1,5 @@
+
+# read in a TempEval2 format file; return contents in format words[filename][sentence index][word index] = "token".
 def readSegmentation(path):
     file = open(path)
 
