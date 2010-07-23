@@ -49,7 +49,7 @@ def findTimexes(words):  # expects words to be in the format words[filename][sen
     dayspec = "("+longdays+"|(mon|tue|wed|thu|fri|sat|sun))"
     fullmonth = "(january|february|march|april|may|june|july|august|september|october|november|december)"
     monthspec = "(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|"+fullmonth+")"
-    fullyear = "1[8-9][0-9]{2}|20[00-10]"
+    fullyear = "1[0-9]{3}|20[0-5][0-9]"
     shortyear = "'?[0-9]{2}"
     simple_ordinals = "(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)"
     numeric_days = "([0-9]{1,2}(st|nd|rd|th)?)"
@@ -82,6 +82,7 @@ def findTimexes(words):  # expects words to be in the format words[filename][sen
     timex_re.append("(("+times+"( "+longdays+")?)|("+longdays+" "+times+"))")
     timex_re.append("("+monthspec+"\.? [0-3]?[0-9](st|nd|rd|th)?)")
     timex_re.append("("+numeric_days+"? "+monthspec+" "+year+"?)")
+    timex_re.append(year)
 
 
     timex_re = map(addBoundary, timex_re)
@@ -141,33 +142,51 @@ def findTimexes(words):  # expects words to be in the format words[filename][sen
                     
                     # list item l
                     added = False
+#                    print c['start'],  c['end'],  buildSentenceList(words[c['doc']][c['sentence']])[c['start']:c['end']+1]
                     for k, l in enumerate(timexes):
                         
+                        # skip timexes not in the same sentence
                         if c['sentence'] != l['sentence'] or c['doc'] != l['doc']:
                             continue
                         
+                        # already found this one - don't bother doing anything with it
                         if c['start'] == l['start'] and c['end'] == l['end']:
                             added = True
                             break
-                            
+                        
+                        # have we got an overlap?
                         elif (c['start'] >= l['start'] and c['start'] <= l['end']) or (c['end'] >= l['start'] and c['end'] <= l['end']):
                             expanded_start = min(c['start'],  l['start'])
                             expanded_end = max(c['end'],  l['end'])
-                            expanded_string = buildSentenceList(words[c['doc']][c['sentence']])[expanded_start:expanded_end]
+                            expanded_string = buildSentenceList(words[c['doc']][c['sentence']])[expanded_start:expanded_end+1]
                             expanded_entry = {'doc':c['doc'], 'sentence':c['sentence'],  'start':expanded_start,  'end':expanded_end,  'tid':tid}
+#                            print 'Merged with', l['start'], '-', l['end'], 'to',  expanded_entry,  expanded_string,  '(from)',  buildSentenceList(words[c['doc']][c['sentence']])[c['start']:c['end']+1],  'and',  buildSentenceList(words[c['doc']][c['sentence']])[l['start']:l['end']+1]
                             tid += 1
-    #                        print 'Merged with', l['start'], '-', l['end'], 'to',  expanded_entry
                             timexes[k] = expanded_entry
                             added = True
-                            break
+                            continue
                     
                         k += 1
                         
                     if not added:
                         c['tid'] = tid
-                        tid += 1
                         timexes.append(c)
+                        tid += 1
 
+    # remove duplicate timexes - these can be annotated when we have something like 10th January 1920, and annotate "January" and "1920" separately, then merge to form "10th January" and "1920", and try to merge "10th January 1920", which will match both fragments.
+    # de-dupe timexes by doc / sentence / start / end
+    for t in timexes:
+
+        # count how many matches for this timex there are; if a copy is found when matches already = 1, nuke it
+        matches = 0
+        for reference,  y in enumerate(timexes):
+            if t['doc'] == y['doc'] and t['sentence'] == y['sentence'] and t['start'] == y['start'] and t['end'] == y['end']:
+                if matches == 0:
+                    matches += 1
+                else:
+                    # remove this element
+                    del timexes[reference]
+            
     return timexes
     
 def getTimexType(timexString,  previous3Words):
